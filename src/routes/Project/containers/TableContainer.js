@@ -10,7 +10,8 @@ const mapDispatchToProps = {
 };
 
 const mapStateToProps = (state) => ({
-  table: state.table
+  table: state.table,
+  clips: state.clips
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Table);
