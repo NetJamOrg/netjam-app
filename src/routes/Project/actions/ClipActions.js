@@ -2,7 +2,7 @@ import ProjectConstants from '../constants';
 
 export function addClip(clip) {
   return {
-    type: ProjectConstants.ADD_CLIP_TO_TRACK,
+    type: ProjectConstants.ADD_CLIP,
     payload: clip
   };
 }
