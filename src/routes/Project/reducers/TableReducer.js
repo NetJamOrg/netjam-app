@@ -1,5 +1,6 @@
 /**
  * @fileOverview: Table state maps a track num (x) to a Track Object
+ * Track Object - Maps beginning time and end time of a clip to clip id
  */
 
 import ACTION_HANDLERS from '../actions/TableActionHandlers';
