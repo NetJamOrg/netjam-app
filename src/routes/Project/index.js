@@ -10,8 +10,9 @@ export default (store) => ({
           const tableReducer = require('./reducers/TableReducer').default;
 
           /*  Add the reducer to the store on key 'counter'  */
-          injectReducer(store, { key: 'clips', clipsReducer });
-          injectReducer(store, { key: 'table', tableReducer });
+          injectReducer(store, { key: 'clips', reducer: clipsReducer });
+
+          injectReducer(store, { key: 'table', reducer: tableReducer });
 
           cb(null, Project);
 
