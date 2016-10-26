@@ -6,7 +6,8 @@ const ACTION_HANDLERS = {
     const track = action.payload.start.y;
     const startTime = action.payload.start.x;
     const endTime = action.payload.end.x;
-    return { ...state,  [id]: { track, startTime, endTime } };
+    const audioPath = action.payload.audioPath;
+    return { ...state,  [id]: { track, startTime, endTime, audioPath } };
   }
 };
 

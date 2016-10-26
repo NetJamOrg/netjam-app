@@ -1,6 +1,6 @@
 /**
  * @fileOverview: ClipsReducer maps a clip id to a clip object
- * Clip Object - Includes start, end, audio, and isEdge info
+ * Clip Object - Includes start, end, and audio path
  */
 
 import ACTION_HANDLERS from '../actions/ClipActionHandlers';
