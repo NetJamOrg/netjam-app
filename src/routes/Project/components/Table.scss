@@ -4,4 +4,8 @@
   background-color: lawngreen;
   display: flex;
   flex-direction: column;
+
+  .track {
+    flex-grow: 1;
+  }
 }
