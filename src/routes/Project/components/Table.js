@@ -1,6 +1,5 @@
 import React from 'react';
 
-import Toolbar from '../containers/ToolbarContainer';
 import './Table.scss';
 
 export const Table = (props) => (
@@ -12,7 +11,6 @@ export const Table = (props) => (
         return previous;
       }, [])
     }
-    <Toolbar/>
   </div>
 );
 
