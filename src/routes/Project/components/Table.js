@@ -6,7 +6,7 @@ export const Table = (props) => (
   <div id="table-component">
     { Object.keys(props.table).reduce((previous, currTrack) => {
         previous.push(
-          <div className="track">track { currTrack }</div>
+          <div className="track"></div>
         );
         return previous;
       }, [])
