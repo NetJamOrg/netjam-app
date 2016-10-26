@@ -1,14 +1,17 @@
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
+import { addClipToTrack } from '../actions/TableActions';
+import { addClip } from '../actions/ClipActions';
 
-import Table from '../components/Table'
+import Table from '../components/Table';
 
 const mapDispatchToProps = {
-
-}
+  addClipToTrack,
+  addClip
+};
 
 const mapStateToProps = (state) => ({
+  table: state.table,
+  clips: state.clips
+});
 
-})
-
-
-export default connect(mapStateToProps, mapDispatchToProps)(Table)
+export default connect(mapStateToProps, mapDispatchToProps)(Table);
