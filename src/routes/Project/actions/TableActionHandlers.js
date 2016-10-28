@@ -1,13 +1,11 @@
 import ProjectConstants from '../constants';
 
 const ACTION_HANDLERS = {
-  [ProjectConstants.ADD_CLIP_TO_TRACK]: (state, action) => {
-    const id = action.payload.id;
-    const track = action.payload.start.y;
-    const startTime = action.payload.start.x;
-    const endTime = action.payload.end.x;
-    return { ...state,  [track]: { ...state[track], [startTime]: id, [endTime]: id } };
-  }
+  [ProjectConstants.ADD_TRACK_TO_TABLE]: (state, action) => {
+    return state + action.payload;
+  },
+
+  [ProjectConstants.REMOVE_TRACK_FROM_TABLE]: (state, action) => state - action.payload
 };
 
 export default ACTION_HANDLERS;

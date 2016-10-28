@@ -5,7 +5,8 @@ import './Toolbar.scss';
 
 export const Toolbar = (props) => (
     <div id="toolbar-component">
-      <button>Add Track</button>
+      <button onClick={ props.addTrack }>Add Track</button>
+      <button onClick={ props.removeTrack }>Remove Track</button>
       <button onClick={ () => addClip(props) }>Add Clip</button>
     </div>
 );
@@ -18,9 +19,9 @@ export default Toolbar;
 
 /* OnClick Functions */
 function addClip(props) {
-  var clip = generateClip();
-  props.addClip(clip);
-  props.addClipToTrack(clip);
+  // var clip = generateClip();
+  // props.addClip(clip);
+  // props.addClipToTrack(clip);
 }
 
 /* HELPERS */

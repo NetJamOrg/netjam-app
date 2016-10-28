@@ -6,9 +6,8 @@ const mapDispatchToProps = {
 
 };
 
-const mapStateToProps = (state) => ({
-  table: state.table,
-  clips: state.clips
+const mapStateToProps = (state, ownProps) => ({
+  table: state.table
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Table);

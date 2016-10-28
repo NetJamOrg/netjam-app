@@ -1,13 +1,22 @@
 import ProjectConstants from '../constants';
 
-export function addClipToTrack(clip) {
-  console.log('adding clip to track');
+export function addTrack() {
+  console.log('adding track');
   return {
-    type: ProjectConstants.ADD_CLIP_TO_TRACK,
-    payload: clip
+    type: ProjectConstants.ADD_TRACK_TO_TABLE,
+    payload: 1
+  };
+}
+
+export function removeTrack() {
+  console.log('removing track');
+  return {
+    type: ProjectConstants.REMOVE_TRACK_FROM_TABLE,
+    payload: 1
   };
 }
 
 export const actions = {
-  addClipToTrack
+  addTrack,
+  removeTrack
 };

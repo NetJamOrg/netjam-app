@@ -1,11 +1,12 @@
 import { connect } from 'react-redux';
-import { addClipToTrack } from '../actions/TableActions';
+import { addTrack, removeTrack } from '../actions/TableActions';
 import { addClip } from '../actions/ClipActions';
 
 import Toolbar from '../components/Toolbar';
 
 const mapDispatchToProps = {
-  addClipToTrack,
+  addTrack,
+  removeTrack,
   addClip
 };
 
