@@ -5,7 +5,7 @@ import './Toolbar.scss';
 
 export const Toolbar = (props) => (
     <div id="toolbar-component">
-      <button onClick={ props.addTrack }>Add Track</button>
+      <button onClick={ () => addTrack(props) }>Add Track</button>
       <button onClick={ props.removeTrack }>Remove Track</button>
       <button onClick={ () => addClip(props) }>Add Clip</button>
     </div>
@@ -19,24 +19,22 @@ export default Toolbar;
 
 /* OnClick Functions */
 function addClip(props) {
-  // var clip = generateClip();
-  // props.addClip(clip);
-  // props.addClipToTrack(clip);
+  var clip = generateClip(props);
+  props.addClipToTrack(clip);
 }
 
+function addTrack(props) {
+  props.incrementTracks();
+  props.addTrack();
+}
 /* HELPERS */
+
 // TODO (Daniel Yakobian): Remove after testing
-function generateClip() {
-  let start = {};
-  start.x = lib.getRandomIntInclusive(0, 120000);
-  start.y = lib.getRandomIntInclusive(0, 4);
-
-  let end = {};
-  end.x = lib.getRandomIntInclusive(start.x, 125000);
-  end.y = start.y;
-
+function generateClip(props) {
   const id = lib.uuid();
-  const clip = { start, end, id };
+  let track = lib.getRandomIntInclusive(0, props.table - 1);
+  let startTime = lib.getRandomIntInclusive(0, 120000);
+  let endTime = lib.getRandomIntInclusive(startTime, 125000);
 
-  return clip;
+  return { startTime, endTime, track, id };
 }

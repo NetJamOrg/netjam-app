@@ -5,7 +5,18 @@ const ACTION_HANDLERS = {
     const id = action.payload.id;
     const startTime = action.payload.startTime;
     const endTime = action.payload.endTime;
-    return { ...state,  [startTime]: id, [endTime]: id };
+    const track = action.payload.track;
+    const clip = { startTime, endTime };
+    return {
+      ...state,  [track]: {
+        ...state[track], [startTime]: id, [endTime]: id, clips: { ...state[track].clips, [id]: clip }
+      }
+    };
+  },
+
+  [ProjectConstants.ADD_TRACK]: (state, action) => {
+    const track = action.payload;
+    return { ...state, [Object.keys(state).length]: track };
   }
 };
 

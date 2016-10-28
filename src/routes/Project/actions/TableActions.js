@@ -1,22 +1,22 @@
 import ProjectConstants from '../constants';
 
-export function addTrack() {
-  console.log('adding track');
+export function incrementTracks() {
+  console.log('incrementing track');
   return {
-    type: ProjectConstants.ADD_TRACK_TO_TABLE,
+    type: ProjectConstants.INCREMENT_TRACKS,
     payload: 1
   };
 }
 
-export function removeTrack() {
-  console.log('removing track');
+export function decrementTracks() {
+  console.log('decrementing track');
   return {
-    type: ProjectConstants.REMOVE_TRACK_FROM_TABLE,
+    type: ProjectConstants.DECREMENT_TRACKS,
     payload: 1
   };
 }
 
 export const actions = {
-  addTrack,
-  removeTrack
+  incrementTracks,
+  decrementTracks
 };

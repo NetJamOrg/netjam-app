@@ -1,6 +1,6 @@
 import ACTION_HANDLERS from '../actions/TableActionHandlers';
 
-const initialState = 4;
+const initialState = 5;
 export default function tableReducer(state = initialState, action) {
   const handler = ACTION_HANDLERS[action.type];
 
