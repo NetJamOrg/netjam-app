@@ -2,7 +2,7 @@ import React from 'react';
 
 import './Track.scss';
 
-import Clip from './Clip';
+import ClipContainer from '../containers/ClipContainer';
 
 export const Table = (props) => (
   <div className="track-component">
@@ -13,7 +13,7 @@ export const Table = (props) => (
 /* Presentational Functions */
 function createClips(props) {
   console.log('createClips props', props);
-  return Object.keys(props.track.clips).map((clipId) => <Clip clipId={clipId} key={ clipId }/>);
+  return Object.keys(props.track.clips).map((clipId) => <ClipContainer clip={props.track.clips[clipId]} key={ clipId }/>);
 }
 
 export default Table;
