@@ -14,8 +14,8 @@ export const Clip = (props) => (
 function clipStyle(props) {
   console.log('clipStyle props', props);
   return {
-    left: `${props.clip.startTime / ProjectConstants.MS_PER_PIXEL}px`,
-    width: `${(props.clip.endTime - props.clip.startTime) / ProjectConstants.MS_PER_PIXEL}px`
+    left: `${timeToPx(props.clip.startTime)}px`,
+    width: `${getClipWidth(props.clip)}px`
   };
 }
 
@@ -29,3 +29,12 @@ function updateClip(props) {
 }
 
 export default Clip;
+
+/* HELPERS */
+function timeToPx(time) {
+  return time / ProjectConstants.MS_PER_PIXEL;
+}
+
+function getClipWidth(clip) {
+  return timeToPx(clip.endTime - clip.startTime);
+}
