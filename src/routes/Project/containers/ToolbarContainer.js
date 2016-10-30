@@ -14,7 +14,7 @@ const mapDispatchToProps = {
 };
 
 const mapStateToProps = (state) => ({
-  table: state.table
+  numTracks: state.tracks.length
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Toolbar);
