@@ -1,0 +1,12 @@
+#toolbar-component {
+  width: 100%;
+  background-color: white;
+  padding: 10px 10px;
+  display: flex;
+  position: fixed;
+  bottom: 0;
+
+  button {
+    margin-right: 8px;
+  }
+}

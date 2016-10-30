@@ -1,16 +1,27 @@
 import React from 'react';
 
+import './Table.scss';
+
+import TrackContainer from '../containers/TrackContainer';
+
 export const Table = (props) => (
-  <div>
-    <h3>I am a table</h3>
-    <h4>The num of tracks is { Object.keys(props.table).length } </h4>
-    <h4>The num of clips is { Object.keys(props.clips).length } </h4>
+  <div id="table-component">
+    { createTracks(props) }
   </div>
 );
 
 Table.propTypes = {
-  table: React.PropTypes.object.isRequired,
-  clips: React.PropTypes.object.isRequired
+  // table: React.PropTypes.number.isRequired
 };
+
+/* Presentation Generation */
+function createTracks(props) {
+  let tracks = [];
+  for (let i = 0; i < props.table; i++) {
+    tracks.push(<TrackContainer key={ i } trackNum={ i }/>);
+  }
+
+  return tracks;
+}
 
 export default Table;

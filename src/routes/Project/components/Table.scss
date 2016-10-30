@@ -1,0 +1,10 @@
+#table-component {
+  width: 100%;
+  background-color: lawngreen;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid black;
+  margin-bottom: 50px;
+  overflow: auto;
+}

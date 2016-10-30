@@ -1,13 +1,15 @@
 import React from 'react';
 
-import Table from '../containers/TableContainer';
 import './ProjectView.scss';
 
+import Table from '../containers/TableContainer';
+import Toolbar from '../containers/ToolbarContainer';
+
 export const ProjectView = (props) => (
-    <div>
-	    <h1>Welcome to View for Project { props.params.id }!</h1>
-	    <Table />
-	  </div>
-  );
+  <div id="project-view-component">
+    <Table />
+    <Toolbar/>
+  </div>
+);
 
 export default ProjectView;

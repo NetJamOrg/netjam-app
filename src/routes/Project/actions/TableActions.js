@@ -1,12 +1,22 @@
 import ProjectConstants from '../constants';
 
-export function addClipToTrack(clip) {
+export function incrementTracks() {
+  console.log('incrementing track');
   return {
-    type: ProjectConstants.ADD_CLIP_TO_TRACK,
-    payload: clip
+    type: ProjectConstants.INCREMENT_TRACKS,
+    payload: 1
+  };
+}
+
+export function decrementTracks() {
+  console.log('decrementing track');
+  return {
+    type: ProjectConstants.DECREMENT_TRACKS,
+    payload: 1
   };
 }
 
 export const actions = {
-  addClipToTrack
+  incrementTracks,
+  decrementTracks
 };
