@@ -5,7 +5,7 @@ import './Clip.scss';
 import ProjectConstants from '../constants';
 
 export const Clip = (props) => (
-  <div className="clip-component" onClick={ () => updateClip(props) } style={ clipStyle(props) }>
+  <div className="clip-component" id= { `#${props.clip.id}` } style={ clipStyle(props) }>
 
   </div>
 );
@@ -17,15 +17,6 @@ function clipStyle(props) {
     left: `${timeToPx(props.clip.startTime)}px`,
     width: `${getClipWidth(props.clip)}px`
   };
-}
-
-/* OnClick functions */
-function updateClip(props) {
-  console.log('Clip.updateTrack props', props);
-  let newClip = { ...props.clip };
-  newClip.endTime += 100;
-  newClip.startTime += 100;
-  props.updateClip(props.clip, newClip);
 }
 
 export default Clip;
