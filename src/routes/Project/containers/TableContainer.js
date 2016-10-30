@@ -6,8 +6,8 @@ const mapDispatchToProps = {
 
 };
 
-const mapStateToProps = (state, ownProps) => ({
-  table: state.table
+const mapStateToProps = (state) => ({
+  numTracks: Object.keys(state.tracks).length
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Table);

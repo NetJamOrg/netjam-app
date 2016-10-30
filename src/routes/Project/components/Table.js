@@ -11,13 +11,14 @@ export const Table = (props) => (
 );
 
 Table.propTypes = {
-  // table: React.PropTypes.number.isRequired
+  numTracks: React.PropTypes.number.isRequired
 };
 
 /* Presentation Generation */
 function createTracks(props) {
+  console.log('Table.createTracks, props', props);
   let tracks = [];
-  for (let i = 0; i < props.table; i++) {
+  for (let i = 0; i < props.numTracks; i++) {
     tracks.push(<TrackContainer key={ i } trackNum={ i }/>);
   }
 
