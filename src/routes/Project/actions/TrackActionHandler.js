@@ -23,7 +23,7 @@ const ACTION_HANDLERS = {
     const oldClip = action.payload.oldClip;
     const newClip = action.payload.newClip;
 
-    // console.log(oldClip, newClip);
+    console.log(oldClip, newClip);
     let newTrack = {
       ...state,
       [newClip.track]: {

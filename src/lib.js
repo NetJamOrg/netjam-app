@@ -1,5 +1,3 @@
-import ProjectConstants from './routes/Project/constants';
-
 export function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -15,16 +13,4 @@ export function uuid() {
 
   return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
     s4() + '-' + s4() + s4() + s4();
-}
-
-export function timeToPx(time) {
-  return time / ProjectConstants.MS_PER_PIXEL;
-}
-
-export function getClipWidth(clip) {
-  return timeToPx(clip.endTime - clip.startTime);
-}
-
-export function pxToTime(pixels) {
-  return pixels * ProjectConstants.MS_PER_PIXEL;
 }
