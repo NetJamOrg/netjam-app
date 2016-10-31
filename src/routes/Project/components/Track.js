@@ -12,7 +12,8 @@ export const Track = (props) => (
 
 /* Presentational Functions */
 function createClips(props) {
-  console.log('createClips props for track', props.trackNum, props);
+  console.log('rendering track', props.trackNum);
+  // console.log('createClips props for track', props.trackNum, props);
   return Object.keys(props.track.clips)
     .map((clipId) => <ClipContainer clip={props.track.clips[clipId]} key={ clipId }/>);
 }
