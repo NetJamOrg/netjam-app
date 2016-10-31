@@ -19,9 +19,8 @@ export default Toolbar;
 
 /* OnClick Functions */
 function addClip(props) {
-  var clip = { id: 1, startTime: 6000, endTime: 20000, track: 0 };
+  var clip = generateClip(props);
   props.addClipToTrack(clip);
-  props.addClipToMap(clip);
 }
 
 function addTrack(props) {
