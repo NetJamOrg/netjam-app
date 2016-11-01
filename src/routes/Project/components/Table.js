@@ -28,6 +28,12 @@ export default class Table extends Component {
     window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
   }
 
+  componentWillUnmount() {
+    window.removeEventListener('mousedown', this.onMouseDown.bind(this), false);
+    window.removeEventListener('mouseup', this.onMouseUp.bind(this), false);
+    window.removeEventListener('mousemove', this.onMouseMove.bind(this), false);
+  }
+
   shouldComponentUpdate(nextProps, nextState) {
     return false;
   }
