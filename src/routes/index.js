@@ -11,7 +11,7 @@ import PageNotFoundRoute from './PageNotFound';
 
 export const createRoutes = (store) => ({
   path: '/',
-  component: CoreLayout(store),
+  component: CoreLayout,
   indexRoute: Home,
   childRoutes: [
     CounterRoute(store),
