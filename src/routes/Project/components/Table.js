@@ -1,14 +1,30 @@
-import React from 'react';
+import React, { Component } from 'react';
 
 import './Table.scss';
 
 import TrackContainer from '../containers/TrackContainer';
 
-export const Table = (props) => (
-  <div id="table-component">
-    { createTracks(props) }
-  </div>
-);
+import $log from 'logger';
+
+const CLASS_NAME = 'Table';
+
+export default class Table extends Component {
+  constructor(props) {
+    super(props);
+  }
+
+  componentDidMount() {
+    $log.d(CLASS_NAME);
+  }
+
+  render() {
+    return (
+      <div id="table-component">
+        { createTracks(this.props) }
+      </div>
+    );
+  }
+}
 
 Table.propTypes = {
   numTracks: React.PropTypes.number.isRequired
@@ -16,7 +32,6 @@ Table.propTypes = {
 
 /* Presentation Generation */
 function createTracks(props) {
-  console.log('Table.createTracks, props', props);
   let tracks = [];
   for (let i = 0; i < props.numTracks; i++) {
     tracks.push(<TrackContainer key={ i } trackNum={ i }/>);
@@ -24,5 +39,3 @@ function createTracks(props) {
 
   return tracks;
 }
-
-export default Table;

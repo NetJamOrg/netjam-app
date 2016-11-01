@@ -2,7 +2,7 @@ import React from 'react';
 
 import './Clip.scss';
 
-import * as lib from '../../../lib';
+import * as lib from '../../../lib/common';
 
 export const Clip = (props) => (
   <div className="clip-component" id= { `clip-component-${props.clip.id}` } style={ clipStyle(props) }>

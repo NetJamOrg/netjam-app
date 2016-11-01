@@ -1,4 +1,4 @@
-import ProjectConstants from './routes/Project/constants';
+import ProjectConstants from '../routes/Project/constants';
 
 export function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
