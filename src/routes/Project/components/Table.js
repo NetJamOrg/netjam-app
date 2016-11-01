@@ -14,7 +14,7 @@ export default class Table extends Component {
   }
 
   componentDidMount() {
-    $log.d(CLASS_NAME);
+    $log.d(CLASS_NAME, 'componentDidMount', 'Hi', { x: 1 });
   }
 
   render() {
