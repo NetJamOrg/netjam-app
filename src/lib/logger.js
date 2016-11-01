@@ -8,11 +8,12 @@ const $log = {
     _method = _method ? `.${_method}` : '';
 
     if (msg && typeof msg !== 'string') {
-      msg = '';
       objs.push(msg);
+      msg = '';
     }
 
     if (!msg) msg = '';
+
     let log = `${_class + _method}: ${msg}`;
 
     console.log(log);

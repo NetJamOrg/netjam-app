@@ -14,7 +14,6 @@ export default class Table extends Component {
   }
 
   componentDidMount() {
-    $log.d(CLASS_NAME, 'componentDidMount', 'Hi', { x: 1 });
     window.addEventListener('mousedown', this.onMouseDown, false);
   }
 
