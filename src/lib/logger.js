@@ -3,6 +3,7 @@
  */
 const $log = {
   d: function (_class, _method, msg) {
+    if (document.location.href.indexOf('localhost') < 0) return;
     _method = _method ? `.${_method}` : '';
 
     if (!msg) msg = '';
