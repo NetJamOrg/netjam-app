@@ -21,14 +21,21 @@ const $log = {
     if (objs.length) console.log('Included Objects:', objs);
   },
 
-  i: function (_class, _method, msg) {
+  d: function (_class, _method, msg) {
+    let objs = [];
     _method = _method ? `.${_method}` : '';
 
+    if (msg && typeof msg !== 'string') {
+      objs.push(msg);
+      msg = '';
+    }
+
     if (!msg) msg = '';
+
     let log = `${_class + _method}: ${msg}`;
 
     console.log(log);
-    let objs = Array.prototype.slice.call(arguments, 3);
+    objs = objs.concat(Array.prototype.slice.call(arguments, 3));
     if (objs.length) console.log('Included Objects:', objs);
   },
 
