@@ -14,6 +14,17 @@ const $log = {
     if (objs.length) console.log('Included Objects:', objs);
   },
 
+  i: function (_class, _method, msg) {
+    _method = _method ? `.${_method}` : '';
+
+    if (!msg) msg = '';
+    let log = `${_class + _method}: ${msg}`;
+
+    console.log(log);
+    let objs = Array.prototype.slice.call(arguments, 3);
+    if (objs.length) console.log('Included Objects:', objs);
+  },
+
   e: function (location, err, msg) {
 
   }
