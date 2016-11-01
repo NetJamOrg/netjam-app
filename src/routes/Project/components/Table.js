@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import _ from 'lodash';
 
 import './Table.scss';
 
@@ -6,6 +7,7 @@ import TrackContainer from '../containers/TrackContainer';
 
 import $log from 'logger';
 import common from 'common';
+import ProjectConstants from '../constants';
 
 const CLASS_NAME = 'Table';
 
@@ -25,13 +27,15 @@ export default class Table extends Component {
   componentDidMount() {
     window.addEventListener('mousedown', this.onMouseDown.bind(this), false);
     window.addEventListener('mouseup', this.onMouseUp.bind(this), false);
-    window.addEventListener('mousemove', this.onMouseMove.bind(this), false);
+    window.addEventListener('mousemove',
+      _.throttle(this.onMouseMove.bind(this), ProjectConstants.CLIP_MOVE_THROTTLE), false);
   }
 
   componentWillUnmount() {
     window.removeEventListener('mousedown', this.onMouseDown.bind(this), false);
     window.removeEventListener('mouseup', this.onMouseUp.bind(this), false);
-    window.removeEventListener('mousemove', this.onMouseMove.bind(this), false);
+    window.removeEventListener('mousemove',
+      _.throttle(this.onMouseMove.bind(this), ProjectConstants.CLIP_MOVE_THROTTLE), false);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
