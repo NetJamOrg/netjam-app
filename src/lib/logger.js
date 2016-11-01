@@ -4,13 +4,19 @@
 const $log = {
   d: function (_class, _method, msg) {
     if (document.location.href.indexOf('localhost') < 0) return;
+    let objs = [];
     _method = _method ? `.${_method}` : '';
+
+    if (msg && typeof msg !== 'string') {
+      msg = '';
+      objs.push(msg);
+    }
 
     if (!msg) msg = '';
     let log = `${_class + _method}: ${msg}`;
 
     console.log(log);
-    let objs = Array.prototype.slice.call(arguments, 3);
+    objs = objs.concat(Array.prototype.slice.call(arguments, 3));
     if (objs.length) console.log('Included Objects:', objs);
   },
 
