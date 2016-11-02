@@ -7,10 +7,8 @@ export default (store) => ({
           const Project = require('./components/ProjectView').default;
 
           const trackReducer = require('./reducers/TrackReducer').default;
-          const clipsReducer = require('./reducers/ClipsReducer').default;
 
           injectReducer(store, { key: 'tracks', reducer: trackReducer });
-          injectReducer(store, { key: 'clipsMap', reducer: clipsReducer });
 
           cb(null, Project);
 
