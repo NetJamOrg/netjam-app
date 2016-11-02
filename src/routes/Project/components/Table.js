@@ -5,11 +5,14 @@ import './Table.scss';
 
 import TrackContainer from '../containers/TrackContainer';
 
-import $log from 'logger';
+import logger from 'logger';
 import common from 'common';
 import ProjectConstants from '../constants';
 
 const CLASS_NAME = 'Table';
+const FILE_NAME = 'Table.js';
+
+const $log = logger(FILE_NAME);
 
 export default class Table extends Component {
   constructor(props) {
