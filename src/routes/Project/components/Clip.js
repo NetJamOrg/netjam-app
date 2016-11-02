@@ -5,7 +5,10 @@ import './Clip.scss';
 import common from 'common';
 
 export const Clip = (props) => (
-  <div className="clip-component" id= { `clip-component-${props.clip.id}-${props.clip.track}` } style={ clipStyle(props) }>
+  <div className="clip-component"
+       id= { `clip-component-${props.clip.id}` }
+       data-track={ props.clip.track }
+       style={ clipStyle(props) }>
 
   </div>
 );

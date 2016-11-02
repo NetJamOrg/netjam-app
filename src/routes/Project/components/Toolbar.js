@@ -21,7 +21,6 @@ export default Toolbar;
 function addClip(props) {
   var clip = { id: 1, startTime: 6000, endTime: 20000, track: 0 };
   props.addClipToTrack(clip);
-  props.addClipToMap(clip);
 }
 
 function addTrack(props) {

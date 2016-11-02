@@ -84,15 +84,16 @@ export default class Table extends Component {
     e.preventDefault();
   }
 
-  updateClip(clipId, trackNum, newStartTime) {
+  updateClip(clipId, oldTrackNum, newTrackNum, newStartTime) {
     const METHOD_NAME = 'updateClip';
 
-    let oldClip = this.props.tracks[trackNum].clips[clipId];
+    let oldClip = this.props.tracks[oldTrackNum].clips[clipId];
     let newClip = { ...oldClip };
     let clipTimeLength = newClip.endTime - newClip.startTime;
     newClip.startTime = newStartTime;
     newClip.endTime = newStartTime + clipTimeLength;
-    this.props.updateClip(oldClip, newClip);
+    newClip.track = newTrackNum;
+    this.props.updateClip(oldClip, newClip, { ...this.props.tracks[oldTrackNum] });
   }
 
   render() {
@@ -123,6 +124,7 @@ function createTracks(props) {
 
 /* EVENT HANDLERS */
 function moveClip(e) {
+
   const FUNCTION_NAME = 'moveClip';
 
   if (!this.state.dragging) return false;
@@ -132,10 +134,6 @@ function moveClip(e) {
     y: e.pageY - this.state.rel.y
   };
 
-  this.setState({
-    pos
-  });
-
   let newClipTime = common.pxToTime(pos.x);
 
   // Don't move clip past start
@@ -143,9 +141,22 @@ function moveClip(e) {
 
   let clipId = this.state.dragging.clipId;
   let trackNum = this.state.dragging.trackNum;
-  if (this.props.tracks[trackNum].clips[clipId].startTime === newClipTime) return;
 
-  this.updateClip(clipId, trackNum, newClipTime);
+  let tableTop = offset(document.getElementById('table-component')).top;
+  let trackHeight = document.getElementById('track-component-1').clientHeight;
+  let newTrackNum = Math.round((e.pageY - tableTop) / trackHeight) - 1;
+  if (newTrackNum >= this.props.numTracks) newTrackNum = this.props.numTracks - 1;
+  if (newTrackNum < 0) newTrackNum = 0;
+
+  this.setState({
+    pos,
+    dragging: { clipId, trackNum: newTrackNum }
+  });
+
+  if (this.props.tracks[trackNum].clips[clipId].startTime === newClipTime
+    && newTrackNum === trackNum) return;
+
+  this.updateClip(clipId, trackNum, newTrackNum, newClipTime);
 
 }
 
@@ -179,12 +190,10 @@ function offset(elem) {
 
 function getClipId(elem) {
   if (!elem) return null;
-  let componentInfo = elem.id.split('clip-component-')[1];
-  if (componentInfo) return componentInfo.split('-')[0];
+  return elem.id.split('clip-component-')[1];
 }
 
 function getClipTrackNum(elem) {
   if (!elem) return null;
-  let componentInfo = elem.id.split('clip-component-')[1];
-  if (componentInfo) return componentInfo.split('-')[1];
+  return elem.dataset.track;
 }

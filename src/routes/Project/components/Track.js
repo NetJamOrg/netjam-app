@@ -5,7 +5,7 @@ import './Track.scss';
 import ClipContainer from '../containers/ClipContainer';
 
 export const Track = (props) => (
-  <div className="track-component">
+  <div className="track-component" id={ `track-component-${props.trackNum}`}>
     { createClips(props) }
   </div>
 );
