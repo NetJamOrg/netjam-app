@@ -87,7 +87,12 @@ export default class Table extends Component {
 
     let newClipTime = common.pxToTime(pos.x);
 
-    this.updateClip(this.state.dragging, newClipTime);
+    if (newClipTime < 0) newClipTime = 0;
+
+    let clipId = this.state.dragging;
+    if (this.props.clipsMap[clipId].startTime === newClipTime) return;
+
+    this.updateClip(clipId, newClipTime);
 
     e.stopPropagation();
     e.preventDefault();
