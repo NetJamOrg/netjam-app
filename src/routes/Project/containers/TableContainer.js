@@ -9,7 +9,7 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state) => ({
   numTracks: Object.keys(state.tracks).length,
-  clipsMap: state.clipsMap
+  tracks: state.tracks
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Table);

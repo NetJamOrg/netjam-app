@@ -53,10 +53,11 @@ export default class Table extends Component {
     if (e.button !== 0) return;
     let elem = e.srcElement;
     let clipId = getClipId(elem);
+    let trackNum = getClipTrackNum(elem);
     if (!clipId) return;
     let pos = offset(elem);
     this.setState({
-      dragging: clipId,
+      dragging: { clipId, trackNum },
       rel: {
         x: e.pageX - pos.left,
         y: e.pageY - pos.top
@@ -77,34 +78,16 @@ export default class Table extends Component {
   onMouseMove(e) {
     const METHOD_NAME = 'onMouseMove';
 
-    if (!this.state.dragging) return;
-
-    let pos = {
-      x: e.pageX - this.state.rel.x,
-      y: e.pageY - this.state.rel.y
-    };
-
-    this.setState({
-      pos
-    });
-
-    let newClipTime = common.pxToTime(pos.x);
-
-    if (newClipTime < 0) newClipTime = 0;
-
-    let clipId = this.state.dragging;
-    if (this.props.clipsMap[clipId].startTime === newClipTime) return;
-
-    this.updateClip(clipId, newClipTime);
+    moveClip.bind(this)(e);
 
     e.stopPropagation();
     e.preventDefault();
   }
 
-  updateClip(clipId, newStartTime) {
+  updateClip(clipId, trackNum, newStartTime) {
     const METHOD_NAME = 'updateClip';
 
-    let oldClip = this.props.clipsMap[clipId];
+    let oldClip = this.props.tracks[trackNum].clips[clipId];
     let newClip = { ...oldClip };
     let clipTimeLength = newClip.endTime - newClip.startTime;
     newClip.startTime = newStartTime;
@@ -138,6 +121,34 @@ function createTracks(props) {
   return tracks;
 }
 
+/* EVENT HANDLERS */
+function moveClip(e) {
+  const FUNCTION_NAME = 'moveClip';
+
+  if (!this.state.dragging) return false;
+
+  let pos = {
+    x: e.pageX - this.state.rel.x,
+    y: e.pageY - this.state.rel.y
+  };
+
+  this.setState({
+    pos
+  });
+
+  let newClipTime = common.pxToTime(pos.x);
+
+  // Don't move clip past start
+  if (newClipTime < 0) newClipTime = 0;
+
+  let clipId = this.state.dragging.clipId;
+  let trackNum = this.state.dragging.trackNum;
+  if (this.props.tracks[trackNum].clips[clipId].startTime === newClipTime) return;
+
+  this.updateClip(clipId, trackNum, newClipTime);
+
+}
+
 /* HELPERS */
 function isWindow(obj) {
   return obj != null && obj === obj.window;
@@ -148,7 +159,6 @@ function getWindow(elem) {
 }
 
 function offset(elem) {
-
   let docElem;
   let win;
   let box = { top: 0, left: 0 };
@@ -165,9 +175,16 @@ function offset(elem) {
     top: box.top + win.pageYOffset - docElem.clientTop,
     left: box.left + win.pageXOffset - docElem.clientLeft
   };
-};
+}
 
 function getClipId(elem) {
   if (!elem) return null;
-  return elem.id.split('clip-component-')[1];
+  let componentInfo = elem.id.split('clip-component-')[1];
+  if (componentInfo) return componentInfo.split('-')[0];
+}
+
+function getClipTrackNum(elem) {
+  if (!elem) return null;
+  let componentInfo = elem.id.split('clip-component-')[1];
+  if (componentInfo) return componentInfo.split('-')[1];
 }

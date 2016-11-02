@@ -22,23 +22,26 @@ const ACTION_HANDLERS = {
   [ProjectConstants.UPDATE_CLIP]: (state, action) => {
     const oldClip = action.payload.oldClip;
     const newClip = action.payload.newClip;
+    const id = oldClip.id;
 
     // console.log(oldClip, newClip);
     let newTrack = {
       ...state,
       [newClip.track]: {
         ...state[newClip.track],
-        [newClip.startTime]: newClip.id,
-        [newClip.endTime]: newClip.id,
+        [newClip.startTime]: id,
+        [newClip.endTime]: id,
         clips: {
           ...state[newClip.track].clips,
-          [newClip.id]: newClip
+          [id]: newClip
         }
       }
     };
 
     delete newTrack[oldClip.track][oldClip.startTime];
     delete newTrack[oldClip.track][oldClip.endTime];
+
+    if (oldClip.track !== newClip.track) delete newTrack[oldClip.track].clips[id];
 
     return newTrack;
   }
