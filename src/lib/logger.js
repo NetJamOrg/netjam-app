@@ -21,7 +21,7 @@ const $log = {
     if (objs.length) console.log('Included Objects:', objs);
   },
 
-  d: function (_class, _method, msg) {
+  i: function (_class, _method, msg) {
     let objs = [];
     _method = _method ? `.${_method}` : '';
 
