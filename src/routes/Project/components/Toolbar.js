@@ -1,5 +1,5 @@
 import React from 'react';
-import * as lib from '../../../lib';
+import * as lib from '../../../lib/common';
 
 import './Toolbar.scss';
 
