@@ -24,11 +24,11 @@ export function removeTrack(num) {
   };
 }
 
-export function updateClip(oldClip, newClip) {
+export function updateClip(oldClip, newClip, oldTrack) {
   // console.log('updating clip', oldClip, newClip);
   return {
     type: ProjectConstants.UPDATE_CLIP,
-    payload: { oldClip, newClip }
+    payload: { oldClip, newClip, oldTrack }
   };
 }
 

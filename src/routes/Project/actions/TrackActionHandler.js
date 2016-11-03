@@ -20,27 +20,47 @@ const ACTION_HANDLERS = {
   },
 
   [ProjectConstants.UPDATE_CLIP]: (state, action) => {
+
     const oldClip = action.payload.oldClip;
     const newClip = action.payload.newClip;
+    const oldTrack = action.payload.oldTrack;
+    const id = oldClip.id;
 
-    // console.log(oldClip, newClip);
-    let newTrack = {
-      ...state,
-      [newClip.track]: {
-        ...state[newClip.track],
-        [newClip.startTime]: newClip.id,
-        [newClip.endTime]: newClip.id,
-        clips: {
-          ...state[newClip.track].clips,
-          [newClip.id]: newClip
+    delete oldTrack[oldClip.startTime];
+    delete oldTrack[oldClip.endTime];
+    delete oldTrack.clips[id];
+
+    let newTracks;
+    if (oldClip.track !== newClip.track) {
+      newTracks = {
+        ...state,
+        [oldClip.track]: oldTrack,
+        [newClip.track]: {
+          ...state[newClip.track],
+          [newClip.startTime]: id,
+          [newClip.endTime]: id,
+          clips: {
+            ...state[newClip.track].clips,
+            [id]: newClip
+          }
         }
-      }
-    };
+      };
+    } else {
+      newTracks = {
+        ...state,
+        [newClip.track]: {
+          ...state[newClip.track],
+          [newClip.startTime]: id,
+          [newClip.endTime]: id,
+          clips: {
+            ...state[newClip.track].clips,
+            [id]: newClip
+          }
+        }
+      };
+    }
 
-    delete newTrack[oldClip.track][oldClip.startTime];
-    delete newTrack[oldClip.track][oldClip.endTime];
-
-    return newTrack;
+    return newTracks;
   }
 };
 

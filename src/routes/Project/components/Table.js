@@ -53,10 +53,11 @@ export default class Table extends Component {
     if (e.button !== 0) return;
     let elem = e.srcElement;
     let clipId = getClipId(elem);
+    let trackNum = getClipTrackNum(elem);
     if (!clipId) return;
     let pos = offset(elem);
     this.setState({
-      dragging: clipId,
+      dragging: { clipId, trackNum },
       rel: {
         x: e.pageX - pos.left,
         y: e.pageY - pos.top
@@ -77,39 +78,22 @@ export default class Table extends Component {
   onMouseMove(e) {
     const METHOD_NAME = 'onMouseMove';
 
-    if (!this.state.dragging) return;
-
-    let pos = {
-      x: e.pageX - this.state.rel.x,
-      y: e.pageY - this.state.rel.y
-    };
-
-    this.setState({
-      pos
-    });
-
-    let newClipTime = common.pxToTime(pos.x);
-
-    if (newClipTime < 0) newClipTime = 0;
-
-    let clipId = this.state.dragging;
-    if (this.props.clipsMap[clipId].startTime === newClipTime) return;
-
-    this.updateClip(clipId, newClipTime);
+    moveClip.bind(this)(e);
 
     e.stopPropagation();
     e.preventDefault();
   }
 
-  updateClip(clipId, newStartTime) {
+  updateClip(clipId, oldTrackNum, newTrackNum, newStartTime) {
     const METHOD_NAME = 'updateClip';
 
-    let oldClip = this.props.clipsMap[clipId];
+    let oldClip = this.props.tracks[oldTrackNum].clips[clipId];
     let newClip = { ...oldClip };
     let clipTimeLength = newClip.endTime - newClip.startTime;
     newClip.startTime = newStartTime;
     newClip.endTime = newStartTime + clipTimeLength;
-    this.props.updateClip(oldClip, newClip);
+    newClip.track = newTrackNum;
+    this.props.updateClip(oldClip, newClip, { ...this.props.tracks[oldTrackNum] });
   }
 
   render() {
@@ -138,6 +122,44 @@ function createTracks(props) {
   return tracks;
 }
 
+/* EVENT HANDLERS */
+function moveClip(e) {
+
+  const FUNCTION_NAME = 'moveClip';
+
+  if (!this.state.dragging) return false;
+
+  let pos = {
+    x: e.pageX - this.state.rel.x,
+    y: e.pageY - this.state.rel.y
+  };
+
+  let newClipTime = common.pxToTime(pos.x);
+
+  // Don't move clip past start
+  if (newClipTime < 0) newClipTime = 0;
+
+  let clipId = this.state.dragging.clipId;
+  let trackNum = this.state.dragging.trackNum;
+
+  let tableTop = offset(document.getElementById('table-component')).top;
+  let trackHeight = document.getElementById('track-component-1').clientHeight;
+  let newTrackNum = Math.round((e.pageY - tableTop) / trackHeight) - 1;
+  if (newTrackNum >= this.props.numTracks) newTrackNum = this.props.numTracks - 1;
+  if (newTrackNum < 0) newTrackNum = 0;
+
+  this.setState({
+    pos,
+    dragging: { clipId, trackNum: newTrackNum }
+  });
+
+  if (this.props.tracks[trackNum].clips[clipId].startTime === newClipTime
+    && newTrackNum === trackNum) return;
+
+  this.updateClip(clipId, trackNum, newTrackNum, newClipTime);
+
+}
+
 /* HELPERS */
 function isWindow(obj) {
   return obj != null && obj === obj.window;
@@ -148,7 +170,6 @@ function getWindow(elem) {
 }
 
 function offset(elem) {
-
   let docElem;
   let win;
   let box = { top: 0, left: 0 };
@@ -165,9 +186,14 @@ function offset(elem) {
     top: box.top + win.pageYOffset - docElem.clientTop,
     left: box.left + win.pageXOffset - docElem.clientLeft
   };
-};
+}
 
 function getClipId(elem) {
   if (!elem) return null;
   return elem.id.split('clip-component-')[1];
+}
+
+function getClipTrackNum(elem) {
+  if (!elem) return null;
+  return elem.dataset.track;
 }
