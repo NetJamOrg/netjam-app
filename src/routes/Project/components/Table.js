@@ -23,7 +23,9 @@ export default class Table extends Component {
     this.state = {
       pos: this.props.initialPos,
       dragging: false,
-      rel: null // position relative to the cursor
+      rel: null, // position relative to the cursor
+      lastSeen: null,
+      slidingClip: false
     };
   }
 
@@ -61,6 +63,10 @@ export default class Table extends Component {
       rel: {
         x: e.pageX - pos.left,
         y: e.pageY - pos.top
+      },
+      lastSeen: {
+        x: e.pageX,
+        y: e.pageY
       }
     });
     e.stopPropagation();
@@ -71,6 +77,11 @@ export default class Table extends Component {
     const METHOD_NAME = 'onMouseUp';
 
     if (this.state.dragging) this.setState({ dragging: false });
+    if (this.state.slidingClip) {
+      clearInterval(this.state.slidingClip);
+      this.setState({ slidingClip: false });
+    }
+
     e.stopPropagation();
     e.preventDefault();
   }
@@ -93,7 +104,7 @@ export default class Table extends Component {
     newClip.startTime = newStartTime;
     newClip.endTime = newStartTime + clipTimeLength;
     newClip.track = newTrackNum;
-    this.props.updateClip(oldClip, newClip, { ...this.props.tracks[oldTrackNum] });
+    this.props.updateClip(oldClip, newClip);
   }
 
   render() {
@@ -127,12 +138,23 @@ function moveClip(e) {
 
   const FUNCTION_NAME = 'moveClip';
 
+  const tableDiv = document.getElementById('table-component');
+  const trackDiv1 = document.getElementById('track-component-1');
+
   if (!this.state.dragging) return false;
 
   let pos = {
     x: e.pageX - this.state.rel.x,
     y: e.pageY - this.state.rel.y
   };
+
+  let lastSeen =  {
+    x: e.pageX,
+    y: e.pageY
+  };
+
+  const isMovingRight = e.pageX - this.state.lastSeen.x > 0;
+  const isMovingLeft = !isMovingRight;
 
   let newClipTime = common.pxToTime(pos.x);
 
@@ -142,18 +164,61 @@ function moveClip(e) {
   let clipId = this.state.dragging.clipId;
   let trackNum = this.state.dragging.trackNum;
 
-  let tableTop = offset(document.getElementById('table-component')).top;
-  let trackHeight = document.getElementById('track-component-1').clientHeight;
+  let tableTop = offset(tableDiv).top;
+  let trackHeight = trackDiv1.clientHeight;
   let newTrackNum = Math.round((e.pageY - tableTop) / trackHeight) - 1;
   if (newTrackNum >= this.props.numTracks) newTrackNum = this.props.numTracks - 1;
   if (newTrackNum < 0) newTrackNum = 0;
 
+  const clip = this.props.tracks[trackNum].clips[clipId];
+  const bodyWidth = document.body.clientWidth;
+  const tableWidth = tableDiv.clientWidth;
+
+  let slidingClip = this.state.slidingClip;
+
+  if (newTrackNum !== trackNum) {
+    if (slidingClip) {
+      clearInterval(slidingClip);
+      slidingClip = false;
+    }
+  }
+
+  const setSlideInterval = () => {
+    const SLIDE_INTERVAL_TIME = 25;
+    const SLIDE_TIME = 100;
+    return setInterval(() => {
+      newClipTime += SLIDE_TIME;
+      let newClipEndPx = common.timeToPx(newClipTime + common.getClipLength(clip));
+      if (newClipEndPx > tableWidth) {
+        tableDiv.style.width = `${newClipEndPx}px`;
+      }
+
+      document.body.scrollLeft += common.timeToPx(SLIDE_TIME);
+      this.updateClip(clipId, trackNum, newTrackNum, newClipTime);
+    }, SLIDE_INTERVAL_TIME);
+  };
+
+  if (newClipTime >= common.pxToTime(document.body.scrollLeft + bodyWidth) - common.getClipLength(clip)) {
+    newClipTime = common.pxToTime(document.body.scrollLeft + bodyWidth) - common.getClipLength(clip);
+
+    if (!slidingClip && newTrackNum === trackNum) {
+      slidingClip = setSlideInterval();
+    }
+  } else {
+    if (slidingClip) {
+      clearInterval(slidingClip);
+      slidingClip = false;
+    }
+  }
+
   this.setState({
     pos,
-    dragging: { clipId, trackNum: newTrackNum }
+    dragging: { clipId, trackNum: newTrackNum },
+    lastSeen,
+    slidingClip
   });
 
-  if (this.props.tracks[trackNum].clips[clipId].startTime === newClipTime
+  if (clip.startTime === newClipTime
     && newTrackNum === trackNum) return;
 
   this.updateClip(clipId, trackNum, newTrackNum, newClipTime);

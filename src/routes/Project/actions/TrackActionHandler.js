@@ -23,15 +23,15 @@ const ACTION_HANDLERS = {
 
     const oldClip = action.payload.oldClip;
     const newClip = action.payload.newClip;
-    const oldTrack = action.payload.oldTrack;
     const id = oldClip.id;
-
-    delete oldTrack[oldClip.startTime];
-    delete oldTrack[oldClip.endTime];
-    delete oldTrack.clips[id];
 
     let newTracks;
     if (oldClip.track !== newClip.track) {
+      let oldTrack = { ...state[oldClip.track] };
+      delete oldTrack[oldClip.startTime];
+      delete oldTrack[oldClip.endTime];
+      delete oldTrack.clips[id];
+
       newTracks = {
         ...state,
         [oldClip.track]: oldTrack,
