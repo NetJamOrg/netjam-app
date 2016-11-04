@@ -166,7 +166,9 @@ function moveClip(e) {
 
   let tableTop = offset(tableDiv).top;
   let trackHeight = trackDiv1.clientHeight;
-  let newTrackNum = Math.round((e.pageY - tableTop) / trackHeight) - 1;
+
+  // + .1 makes it a bit more snappy
+  let newTrackNum = Math.round((e.pageY - tableTop) / trackHeight + .1) - 1;
   if (newTrackNum >= this.props.numTracks) newTrackNum = this.props.numTracks - 1;
   if (newTrackNum < 0) newTrackNum = 0;
 
@@ -183,26 +185,40 @@ function moveClip(e) {
     }
   }
 
-  const setSlideInterval = () => {
-    const SLIDE_INTERVAL_TIME = 25;
-    const SLIDE_TIME = 100;
-    return setInterval(() => {
-      newClipTime += SLIDE_TIME;
+  const setSlideRightInterval = () => setInterval(() => {
+      newClipTime += ProjectConstants.SLIDE_TIME;
       let newClipEndPx = common.timeToPx(newClipTime + common.getClipLength(clip));
       if (newClipEndPx > tableWidth) {
         tableDiv.style.width = `${newClipEndPx}px`;
       }
 
-      document.body.scrollLeft += common.timeToPx(SLIDE_TIME);
+      document.body.scrollLeft += common.timeToPx(ProjectConstants.SLIDE_TIME);
       this.updateClip(clipId, trackNum, newTrackNum, newClipTime);
-    }, SLIDE_INTERVAL_TIME);
-  };
+    }, ProjectConstants.SLIDE_INTERVAL_TIME);
+
+  const setSlideLeftInterval = () => setInterval(() => {
+    newClipTime -= ProjectConstants.SLIDE_TIME;
+    if (newClipTime < 0) newClipTime = 0;
+    let newClipEndPx = common.timeToPx(newClipTime + common.getClipLength(clip));
+    if (newClipEndPx > tableWidth) {
+      tableDiv.style.width = `${newClipEndPx}px`;
+    }
+
+    document.body.scrollLeft -= common.timeToPx(ProjectConstants.SLIDE_TIME);
+    this.updateClip(clipId, trackNum, newTrackNum, newClipTime);
+  }, ProjectConstants.SLIDE_INTERVAL_TIME);
 
   if (newClipTime >= common.pxToTime(document.body.scrollLeft + bodyWidth) - common.getClipLength(clip)) {
     newClipTime = common.pxToTime(document.body.scrollLeft + bodyWidth) - common.getClipLength(clip);
 
     if (!slidingClip && newTrackNum === trackNum) {
-      slidingClip = setSlideInterval();
+      slidingClip = setSlideRightInterval();
+    }
+  } else if (newClipTime <= common.pxToTime(document.body.scrollLeft) && newClipTime > 0) {
+    newClipTime = common.pxToTime(document.body.scrollLeft);
+
+    if (!slidingClip && newTrackNum === trackNum) {
+      slidingClip = setSlideLeftInterval();
     }
   } else {
     if (slidingClip) {
