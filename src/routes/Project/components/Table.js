@@ -34,6 +34,37 @@ export default class Table extends Component {
     window.addEventListener('mouseup', this.onMouseUp.bind(this), false);
     window.addEventListener('mousemove',
       _.throttle(this.onMouseMove.bind(this), ProjectConstants.CLIP_MOVE_THROTTLE), false);
+
+    // set the table div width because of edge case where you shrink window with clip out of view,
+    // if you scroll to view clip  the tracks will stop where you left the resize
+    const tableDiv = document.getElementById('table-component');
+    tableDiv.style.width = `${tableDiv.clientWidth}px`;
+
+    (function () {
+      var throttle = (type, name, obj) => {
+        obj = obj || window;
+        var running = false;
+        var func = () => {
+          if (running) { return; }
+
+          running = true;
+          requestAnimationFrame(() => {
+            obj.dispatchEvent(new CustomEvent(name));
+            running = false;
+          });
+        };
+
+        obj.addEventListener(type, func);
+      };
+
+      /* init - you can init any event */
+      throttle('resize', 'optimizedResize');
+    })();
+
+    // this is for the scenario wh
+    window.addEventListener('optimizedResize', _.throttle((e) => {
+      if (document.body.clientWidth > tableDiv.clientWidth) tableDiv.style.width = `${document.body.clientWidth}px`;
+    }, ProjectConstants.RESIZE_THROTTLE));
   }
 
   componentWillUnmount() {
@@ -199,11 +230,6 @@ function moveClip(e) {
   const setSlideLeftInterval = () => setInterval(() => {
     newClipTime -= ProjectConstants.SLIDE_TIME;
     if (newClipTime < 0) newClipTime = 0;
-    let newClipEndPx = common.timeToPx(newClipTime + common.getClipLength(clip));
-    if (newClipEndPx > tableWidth) {
-      tableDiv.style.width = `${newClipEndPx}px`;
-    }
-
     document.body.scrollLeft -= common.timeToPx(ProjectConstants.SLIDE_TIME);
     this.updateClip(clipId, trackNum, newTrackNum, newClipTime);
   }, ProjectConstants.SLIDE_INTERVAL_TIME);
@@ -214,7 +240,7 @@ function moveClip(e) {
     if (!slidingClip && newTrackNum === trackNum) {
       slidingClip = setSlideRightInterval();
     }
-  } else if (newClipTime <= common.pxToTime(document.body.scrollLeft) && newClipTime > 0) {
+  } else if (newClipTime <= common.pxToTime(document.body.scrollLeft)) {
     newClipTime = common.pxToTime(document.body.scrollLeft);
 
     if (!slidingClip && newTrackNum === trackNum) {
