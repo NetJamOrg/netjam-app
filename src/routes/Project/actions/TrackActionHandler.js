@@ -7,9 +7,22 @@ const ACTION_HANDLERS = {
     const endTime = action.payload.endTime;
     const track = action.payload.track;
     const clip = { startTime, endTime, id, track };
+
+    let edgeClip;
+    if (!state[track].edgeClip) {
+      edgeClip = clip;
+    } else if (state[track].edgeClip.endTime >= endTime) {
+      edgeClip = state[track].edgeClip;
+    } else {
+      edgeClip = clip;
+    }
+
     return {
       ...state,  [track]: {
-        ...state[track], [startTime]: id, [endTime]: id, clips: { ...state[track].clips, [id]: clip }
+        ...state[track],
+        [startTime]: id,
+        [endTime]: id,
+        clips: { ...state[track].clips, [id]: clip }, edgeClip
       }
     };
   },
@@ -32,6 +45,15 @@ const ACTION_HANDLERS = {
       delete oldTrack[oldClip.endTime];
       delete oldTrack.clips[id];
 
+      let edgeClip;
+      if (!state[oldClip.track].edgeClip) {
+        edgeClip = newClip;
+      } else if (state[oldClip.track].edgeClip.endTime >= newClip.endTime) {
+        edgeClip = state[oldClip.track].edgeClip;
+      } else {
+        edgeClip = newClip;
+      }
+
       newTracks = {
         ...state,
         [oldClip.track]: oldTrack,
@@ -42,10 +64,20 @@ const ACTION_HANDLERS = {
           clips: {
             ...state[newClip.track].clips,
             [id]: newClip
-          }
+          },
+          edgeClip
         }
       };
     } else {
+      let edgeClip;
+      if (!state[newClip.track].edgeClip) {
+        edgeClip = newClip;
+      } else if (state[newClip.track].edgeClip.endTime >= newClip.endTime) {
+        edgeClip = state[newClip.track].edgeClip;
+      } else {
+        edgeClip = newClip;
+      }
+
       newTracks = {
         ...state,
         [newClip.track]: {
@@ -55,9 +87,16 @@ const ACTION_HANDLERS = {
           clips: {
             ...state[newClip.track].clips,
             [id]: newClip
-          }
+          },
+          edgeClip
         }
       };
+
+      delete newTracks[newClip.track][oldClip.startTime];
+      delete newTracks[newClip.track][oldClip.endTime];
+
+      console.log(newTracks);
+
     }
 
     return newTracks;
