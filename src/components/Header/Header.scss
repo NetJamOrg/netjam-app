@@ -1,4 +1,9 @@
-.route--active {
-  font-weight: bold;
-  text-decoration: underline;
+#header-component {
+  position: fixed;
+  width: 100%;
+
+  .route--active {
+    font-weight: bold;
+    text-decoration: underline;
+  }
 }
