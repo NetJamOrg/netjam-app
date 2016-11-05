@@ -46,6 +46,8 @@ const ACTION_HANDLERS = {
     let track = state[newClip.track];
     let isMovingRight = oldClip.startTime < newClip.startTime;
     let isMovingLeft = !isMovingRight;
+    let clipLength = common.getClipLength(newClip);
+
     for (let time in track) {
       let time = Number(time);
       if (Number.isNaN(time)) continue;
@@ -54,7 +56,6 @@ const ACTION_HANDLERS = {
       if (timeClip.id === newClip.id) continue;
 
       if (newClip.endTime >= time - 1 && newClip.startTime <= timeClip.endTime) {
-        let clipLength = common.getClipLength(newClip);
         if (isMovingRight) {
           newClip.endTime = time - 1;
           newClip.startTime = time - clipLength - 1;
