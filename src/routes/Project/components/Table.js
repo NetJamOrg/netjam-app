@@ -141,7 +141,7 @@ export default class Table extends Component {
 
     this.props.updateClip(oldClip, newClip);
 
-    const getMostEdgeClip = (clip) => {
+    const getMostEdgeClip = () => {
       let mostEdgeClip;
 
       for (let trackNum in this.props.tracks) {
