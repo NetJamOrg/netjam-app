@@ -1,14 +1,12 @@
 import { connect } from 'react-redux';
 import { addTrack, removeTrack, addClipToTrack } from '../actions/TrackActions';
-import { addClipToMap } from '../actions/ClipActions';
 
 import Toolbar from '../components/Toolbar';
 
 const mapDispatchToProps = {
   addTrack,
   removeTrack,
-  addClipToTrack,
-  addClipToMap
+  addClipToTrack
 };
 
 const mapStateToProps = (state) => ({

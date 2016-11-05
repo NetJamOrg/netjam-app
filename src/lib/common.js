@@ -26,6 +26,10 @@ const common = {
     return this.timeToPx(clip.endTime - clip.startTime);
   },
 
+  getClipLength: function (clip) {
+    return clip.endTime - clip.startTime;
+  },
+
   pxToTime: function (pixels) {
     return pixels * ProjectConstants.MS_PER_PIXEL;
   }

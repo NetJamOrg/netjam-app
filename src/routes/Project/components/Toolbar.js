@@ -1,5 +1,5 @@
 import React from 'react';
-import * as lib from '../../../lib/common';
+import common from 'common';
 
 import './Toolbar.scss';
 
@@ -19,7 +19,7 @@ export default Toolbar;
 
 /* OnClick Functions */
 function addClip(props) {
-  var clip = { id: 1, startTime: 6000, endTime: 20000, track: 0 };
+  var clip = { id: common.uuid(), startTime: 6000, endTime: 20000, track: 0 };
   props.addClipToTrack(clip);
 }
 
