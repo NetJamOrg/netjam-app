@@ -1,6 +1,8 @@
 import ProjectConstants from '../constants';
 import _ from 'lodash';
 
+import common from 'common';
+
 const ACTION_HANDLERS = {
   [ProjectConstants.ADD_CLIP_TO_TRACK]: (state, action) => {
     const id = action.payload.id;
@@ -40,6 +42,30 @@ const ACTION_HANDLERS = {
     const id = oldClip.id;
 
     if (_.isEqual(oldClip, newClip)) return state;
+
+    let track = state[newClip.track];
+    let isMovingRight = oldClip.startTime < newClip.startTime;
+    let isMovingLeft = !isMovingRight;
+    for (let time in track) {
+      let time = Number(time);
+      if (Number.isNaN(time)) continue;
+
+      let timeClip = track.clips[track[time]];
+      if (timeClip.id === newClip.id) continue;
+
+      if (newClip.endTime >= time - 1 && newClip.startTime <= timeClip.endTime) {
+        let clipLength = common.getClipLength(newClip);
+        if (isMovingRight) {
+          newClip.endTime = time - 1;
+          newClip.startTime = time - clipLength - 1;
+        } else {
+          newClip.endTime = timeClip.endTime + clipLength + 1;
+          newClip.startTime = timeClip.endTime + 1;
+        }
+
+        break;
+      }
+    }
 
     let newTracks;
     if (oldClip.track !== newClip.track) {
