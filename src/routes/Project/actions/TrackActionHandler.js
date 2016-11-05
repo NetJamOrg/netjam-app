@@ -68,6 +68,8 @@ const ACTION_HANDLERS = {
       }
     }
 
+    if (_.isEqual(oldClip, newClip)) return state;
+
     let newTracks;
     if (oldClip.track !== newClip.track) {
       let oldTrack = { ...state[oldClip.track] };
