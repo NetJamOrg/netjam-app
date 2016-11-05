@@ -155,7 +155,7 @@ export default class Table extends Component {
       return mostEdgeClip;
     };
 
-    let mostEdgeClip = getMostEdgeClip(newClip);
+    let mostEdgeClip = getMostEdgeClip();
     if (isMovingLeft && mostEdgeClip.id === newClip.id) {
       if (common.timeToPx(newClip.endTime) >= document.body.clientWidth) {
         tableDiv.style.width = `${common.timeToPx(newClip.endTime)}px`;
