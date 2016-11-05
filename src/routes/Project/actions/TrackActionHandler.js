@@ -1,4 +1,5 @@
 import ProjectConstants from '../constants';
+import _ from 'lodash';
 
 const ACTION_HANDLERS = {
   [ProjectConstants.ADD_CLIP_TO_TRACK]: (state, action) => {
@@ -38,21 +39,15 @@ const ACTION_HANDLERS = {
     const newClip = action.payload.newClip;
     const id = oldClip.id;
 
+    if (_.isEqual(oldClip, newClip)) return state;
+
     let newTracks;
     if (oldClip.track !== newClip.track) {
       let oldTrack = { ...state[oldClip.track] };
       delete oldTrack[oldClip.startTime];
       delete oldTrack[oldClip.endTime];
       delete oldTrack.clips[id];
-
-      let edgeClip;
-      if (!state[oldClip.track].edgeClip) {
-        edgeClip = newClip;
-      } else if (state[oldClip.track].edgeClip.endTime >= newClip.endTime) {
-        edgeClip = state[oldClip.track].edgeClip;
-      } else {
-        edgeClip = newClip;
-      }
+      oldTrack.edgeClip = findEdgeClip(oldTrack);
 
       newTracks = {
         ...state,
@@ -64,20 +59,12 @@ const ACTION_HANDLERS = {
           clips: {
             ...state[newClip.track].clips,
             [id]: newClip
-          },
-          edgeClip
+          }
         }
       };
-    } else {
-      let edgeClip;
-      if (!state[newClip.track].edgeClip) {
-        edgeClip = newClip;
-      } else if (state[newClip.track].edgeClip.endTime >= newClip.endTime) {
-        edgeClip = state[newClip.track].edgeClip;
-      } else {
-        edgeClip = newClip;
-      }
 
+      newTracks[newClip.track].edgeClip = findEdgeClip(newTracks[newClip.track]);
+    } else {
       newTracks = {
         ...state,
         [newClip.track]: {
@@ -87,16 +74,13 @@ const ACTION_HANDLERS = {
           clips: {
             ...state[newClip.track].clips,
             [id]: newClip
-          },
-          edgeClip
+          }
         }
       };
 
       delete newTracks[newClip.track][oldClip.startTime];
       delete newTracks[newClip.track][oldClip.endTime];
-
-      console.log(newTracks);
-
+      newTracks[newClip.track].edgeClip = findEdgeClip(newTracks[newClip.track]);
     }
 
     return newTracks;
@@ -104,3 +88,17 @@ const ACTION_HANDLERS = {
 };
 
 export default ACTION_HANDLERS;
+
+/* HELPERS */
+function findEdgeClip(track) {
+  let max;
+  for (let time in track) {
+    time = Number(time);
+    if (typeof time === 'number' && !Number.isNaN(time)) {
+      if (!max || time > max) max = time;
+    }
+  }
+
+  if (!max) return null;
+  return track.clips[track[max]];
+}

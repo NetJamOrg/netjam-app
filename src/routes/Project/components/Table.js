@@ -126,16 +126,47 @@ export default class Table extends Component {
     e.preventDefault();
   }
 
-  updateClip(clipId, oldTrackNum, newTrackNum, newStartTime) {
+  updateClip(clipId, oldTrackNum, newTrackNum, newStartTime, isMovingLeft) {
     const METHOD_NAME = 'updateClip';
+
+    const tableDiv = document.getElementById('table-component');
 
     let oldClip = this.props.tracks[oldTrackNum].clips[clipId];
     let newClip = { ...oldClip };
+
     let clipTimeLength = newClip.endTime - newClip.startTime;
     newClip.startTime = newStartTime;
     newClip.endTime = newStartTime + clipTimeLength;
     newClip.track = newTrackNum;
+
     this.props.updateClip(oldClip, newClip);
+
+    const getMostEdgeClip = (clip) => {
+      let mostEdgeClip;
+
+      for (let trackNum in this.props.tracks) {
+        let track = this.props.tracks[trackNum];
+        if (!track.edgeClip) continue;
+        if (!mostEdgeClip || track.edgeClip.endTime > mostEdgeClip.endTime) {
+          mostEdgeClip = track.edgeClip;
+        }
+      }
+
+      return mostEdgeClip;
+    };
+
+    let mostEdgeClip = getMostEdgeClip(newClip);
+    if (isMovingLeft && mostEdgeClip.id === newClip.id) {
+      if (common.timeToPx(newClip.endTime) >= document.body.clientWidth) {
+        tableDiv.style.width = `${common.timeToPx(newClip.endTime)}px`;
+      }
+    } else if (isMovingLeft) {
+      if (common.timeToPx(mostEdgeClip.endTime) < tableDiv.clientWidth
+        && tableDiv.clientWidth > document.body.clientWidth) {
+        tableDiv.style.width = `${common.timeToPx(mostEdgeClip.endTime)}px`;
+      }
+    }
+
   }
 
   render() {
@@ -224,14 +255,14 @@ function moveClip(e) {
       }
 
       document.body.scrollLeft += common.timeToPx(ProjectConstants.SLIDE_TIME);
-      this.updateClip(clipId, trackNum, newTrackNum, newClipTime);
+      this.updateClip(clipId, trackNum, newTrackNum, newClipTime, isMovingLeft);
     }, ProjectConstants.SLIDE_INTERVAL_TIME);
 
   const setSlideLeftInterval = () => setInterval(() => {
     newClipTime -= ProjectConstants.SLIDE_TIME;
     if (newClipTime < 0) newClipTime = 0;
     document.body.scrollLeft -= common.timeToPx(ProjectConstants.SLIDE_TIME);
-    this.updateClip(clipId, trackNum, newTrackNum, newClipTime);
+    this.updateClip(clipId, trackNum, newTrackNum, newClipTime, isMovingLeft);
   }, ProjectConstants.SLIDE_INTERVAL_TIME);
 
   if (newClipTime >= common.pxToTime(document.body.scrollLeft + bodyWidth) - common.getClipLength(clip)) {
@@ -263,7 +294,7 @@ function moveClip(e) {
   if (clip.startTime === newClipTime
     && newTrackNum === trackNum) return;
 
-  this.updateClip(clipId, trackNum, newTrackNum, newClipTime);
+  this.updateClip(clipId, trackNum, newTrackNum, newClipTime, isMovingLeft);
 
 }
 
