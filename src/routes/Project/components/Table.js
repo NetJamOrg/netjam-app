@@ -160,10 +160,14 @@ export default class Table extends Component {
       if (common.timeToPx(newClip.endTime) >= document.body.clientWidth) {
         tableDiv.style.width = `${common.timeToPx(newClip.endTime)}px`;
       }
-    } else if (isMovingLeft) {
+    }
+
+    if (isMovingLeft) {
       if (common.timeToPx(mostEdgeClip.endTime) < tableDiv.clientWidth
         && tableDiv.clientWidth > document.body.clientWidth) {
-        tableDiv.style.width = `${common.timeToPx(mostEdgeClip.endTime)}px`;
+        let newWidth = common.timeToPx(mostEdgeClip.endTime);
+        if (newWidth < document.body.clientWidth) newWidth = document.body.clientWidth;
+        tableDiv.style.width = `${newWidth}px`;
       }
     }
 
