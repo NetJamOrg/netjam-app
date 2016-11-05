@@ -48,6 +48,7 @@ const ACTION_HANDLERS = {
     let isMovingLeft = !isMovingRight;
     let clipLength = common.getClipLength(newClip);
 
+    // handle collision avoidance
     for (let time in track) {
       let time = Number(time);
       if (Number.isNaN(time)) continue;
@@ -55,7 +56,10 @@ const ACTION_HANDLERS = {
       let timeClip = track.clips[track[time]];
       if (timeClip.id === newClip.id) continue;
 
-      if (newClip.endTime >= time - 1 && newClip.startTime <= timeClip.endTime) {
+
+      // for each clip, if the new clip ends after clip starts and the new clip starts before the clip ends
+      if (newClip.endTime >= timeClip.startTime - 1 && newClip.startTime <= timeClip.endTime) {
+        // snap either to that clip's right or left, depending on direction of motion
         if (isMovingRight) {
           newClip.endTime = time - 1;
           newClip.startTime = time - clipLength - 1;
@@ -63,8 +67,6 @@ const ACTION_HANDLERS = {
           newClip.endTime = timeClip.endTime + clipLength + 1;
           newClip.startTime = timeClip.endTime + 1;
         }
-
-        break;
       }
     }
 
