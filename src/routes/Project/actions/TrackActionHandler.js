@@ -46,7 +46,6 @@ const ACTION_HANDLERS = {
     let track = state[newClip.track];
     let isMovingRight = oldClip.startTime < newClip.startTime;
     let isMovingLeft = !isMovingRight;
-    let clipLength = common.getClipLength(newClip);
 
     // handle collision avoidance
     for (let time in track) {
@@ -55,6 +54,7 @@ const ACTION_HANDLERS = {
 
       let timeClip = track.clips[track[time]];
       if (timeClip.id === newClip.id) continue;
+      let clipLength = common.getClipLength(timeClip);
 
 
       // for each clip, if the new clip ends after clip starts and the new clip starts before the clip ends
