@@ -176,7 +176,7 @@ export default class Table extends Component {
   render() {
     const METHOD_NAME = 'render';
 
-    $log.d(CLASS_NAME, METHOD_NAME, 'Rendering');
+    // $log.d(CLASS_NAME, METHOD_NAME, 'Rendering');
     return (
       <div id="table-component">
         { createTracks(this.props) }
