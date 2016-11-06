@@ -47,28 +47,40 @@ const ACTION_HANDLERS = {
     let isMovingRight = oldClip.startTime < newClip.startTime;
     let isMovingLeft = !isMovingRight;
 
-    // handle collision avoidance
-    for (let time in track) {
-      let time = Number(time);
-      if (Number.isNaN(time)) continue;
+    // handle collision avoidance. not very efficient but should work.
+    const adjustForCollisions = function (newClip, track) {
+      let times = _(track).keys()
+        .map(Number)
+        .filter(_.isFinite)
+        .sortBy()
+        .value();
 
-      let timeClip = track.clips[track[time]];
-      if (timeClip.id === newClip.id) continue;
-      let clipLength = common.getClipLength(timeClip);
+      for (let time of times) {
+        let timeClip = track.clips[track[time]];
+        if (timeClip.id === newClip.id) continue;
+        let clipLength = common.getClipLength(timeClip);
 
+        // for each clip, if the new clip ends after
+        // clip starts and the new clip starts before the clip ends
+        if (newClip.endTime > timeClip.startTime && newClip.startTime <= timeClip.endTime) {
 
-      // for each clip, if the new clip ends after clip starts and the new clip starts before the clip ends
-      if (newClip.endTime >= timeClip.startTime - 1 && newClip.startTime <= timeClip.endTime) {
-        // snap either to that clip's right or left, depending on direction of motion
-        if (isMovingRight) {
-          newClip.endTime = time - 1;
-          newClip.startTime = time - clipLength - 1;
-        } else {
-          newClip.endTime = timeClip.endTime + clipLength + 1;
-          newClip.startTime = timeClip.endTime + 1;
+          // snap either to that clip's right or left,
+          // depending on direction of motion (if right, snap to left, etc)
+          if (isMovingRight) {
+            newClip.endTime = timeClip.startTime - 1;
+            newClip.startTime = timeClip.startTime - clipLength - 1;
+          } else {
+            newClip.endTime = timeClip.endTime + clipLength + 1;
+            newClip.startTime = timeClip.endTime + 1;
+          }
+
+          // and recurse
+          adjustForCollisions(newClip, track);
         }
       }
-    }
+    };
+
+    adjustForCollisions(newClip, track);
 
     if (_.isEqual(oldClip, newClip)) return state;
 
