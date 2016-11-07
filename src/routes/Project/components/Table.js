@@ -178,7 +178,7 @@ export default class Table extends Component {
 
     // $log.d(CLASS_NAME, METHOD_NAME, 'Rendering');
     return (
-      <div id="table-component">
+        <div id="table-component" style={{backgroundSize: '100px 100px'}}>
         { createTracks(this.props) }
       </div>
     );
