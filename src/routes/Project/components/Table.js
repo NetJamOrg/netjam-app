@@ -25,7 +25,7 @@ export default class Table extends Component {
       dragging: false,
       rel: null, // position relative to the cursor
       lastSeen: null,
-      slidingClip: false
+      slidingClip: false,
     };
   }
 
@@ -38,7 +38,8 @@ export default class Table extends Component {
     // set the table div width because of edge case where you shrink window with clip out of view,
     // if you scroll to view clip  the tracks will stop where you left the resize
     const tableDiv = document.getElementById('table-component');
-    tableDiv.style.width = `${tableDiv.clientWidth}px`;
+    //tableDiv.style.width = `${tableDiv.clientWidth}px`;  // HERE
+    this.props.resizeTable(tableDiv.clientWidth);
 
     (function () {
       var throttle = (type, name, obj) => {
@@ -63,7 +64,10 @@ export default class Table extends Component {
 
     // this is for the scenario wh
     window.addEventListener('optimizedResize', _.throttle((e) => {
-      if (document.body.clientWidth > tableDiv.clientWidth) tableDiv.style.width = `${document.body.clientWidth}px`;
+      if (document.body.clientWidth > tableDiv.clientWidth) {
+        // tableDiv.style.width = `${document.body.clientWidth}px`; // HERE
+        this.props.resizeTable(document.body.clientWidth);
+      }
     }, ProjectConstants.RESIZE_THROTTLE));
   }
 
@@ -75,7 +79,9 @@ export default class Table extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return false;
+    return nextProps.widthPx != this.props.widthPx ||
+      nextProps.timeInterval != this.props.timeInterval ||
+      nextProps.timeSig != this.props.timeSig;
   }
 
   // calculate relative position to the mouse and set dragging=true
@@ -139,7 +145,7 @@ export default class Table extends Component {
     newClip.endTime = newStartTime + clipTimeLength;
     newClip.track = newTrackNum;
 
-    this.props.updateClip(oldClip, newClip);
+    this.props.updateClip(oldClip, newClip); ///////
 
     const getMostEdgeClip = () => {
       let mostEdgeClip;
@@ -158,7 +164,8 @@ export default class Table extends Component {
     let mostEdgeClip = getMostEdgeClip();
     if (isMovingLeft && mostEdgeClip.id === newClip.id) {
       if (common.timeToPx(newClip.endTime) >= document.body.clientWidth) {
-        tableDiv.style.width = `${common.timeToPx(newClip.endTime)}px`;
+        this.props.resizeTable(common.timeToPx(newClip.endTime));
+        // tableDiv.style.width = `${common.timeToPx(newClip.endTime)}px`; // HERE
       }
     }
 
@@ -167,7 +174,8 @@ export default class Table extends Component {
         && tableDiv.clientWidth > document.body.clientWidth) {
         let newWidth = common.timeToPx(mostEdgeClip.endTime);
         if (newWidth < document.body.clientWidth) newWidth = document.body.clientWidth;
-        tableDiv.style.width = `${newWidth}px`;
+        this.props.resizeTable(newWidth);
+        // tableDiv.style.width = `${newWidth}px`; // HERE
       }
     }
 
@@ -177,16 +185,22 @@ export default class Table extends Component {
     const METHOD_NAME = 'render';
 
     // $log.d(CLASS_NAME, METHOD_NAME, 'Rendering');
+    // TODO actual math here with interval, sig
+    // also don't scale backgroundSize with widthPx
+
     return (
-        <div id="table-component" style={{backgroundSize: '100px 100px'}}>
+      <div id="table-component" style={{width: this.props.widthPx, backgroundSize: `${this.props.widthPx / 10}px`}}>
         { createTracks(this.props) }
       </div>
     );
   }
+
+
 }
 
 Table.propTypes = {
-  numTracks: React.PropTypes.number.isRequired
+  numTracks: React.PropTypes.number.isRequired,
+  widthPx:   React.PropTypes.number.isRequired
 };
 
 /* Presentation Generation */
