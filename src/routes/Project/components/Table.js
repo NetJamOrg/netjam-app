@@ -145,7 +145,9 @@ export default class Table extends Component {
     newClip.endTime = newStartTime + clipTimeLength;
     newClip.track = newTrackNum;
 
-    this.props.updateClip(oldClip, newClip); ///////
+    this.props.updateClip(oldClip, newClip,
+                          {numMeasures: this.props.numMeasures,
+                           timeInterval:this.props.timeInterval});
 
     const getMostEdgeClip = () => {
       let mostEdgeClip;

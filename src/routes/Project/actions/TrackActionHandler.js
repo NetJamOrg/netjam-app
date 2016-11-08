@@ -39,6 +39,7 @@ const ACTION_HANDLERS = {
 
     const oldClip = action.payload.oldClip;
     const newClip = action.payload.newClip;
+    const tableInfo = action.payload.tableInfo;
     const id = oldClip.id;
 
     if (_.isEqual(oldClip, newClip)) return state;
@@ -49,7 +50,7 @@ const ACTION_HANDLERS = {
 
 
     // grid snapping
-    let gridTimes = common.gridTimesAround(newClip.startTime, newClip.endTime, 4);
+    let gridTimes = common.gridTimesAround(newClip.startTime, newClip.endTime, tableInfo);
     let snapTarget = _.find(gridTimes, t => Math.abs(newClip.startTime - t) < ProjectConstants.GRID_SNAP_THRESHOLD);
     if(snapTarget != null) {
       console.log(`snapping to ${snapTarget}`);
