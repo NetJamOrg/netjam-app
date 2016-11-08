@@ -9,7 +9,8 @@ export default class Clip extends Component {
     let clipMenu = document.getElementById('clip-menu');
     clipMenu.style.left = common.numToPx(x);
     clipMenu.style.top = common.numToPx(y);
-    clipMenu.style.display = 'initial';
+    clipMenu.dataset.clipId = this.props.clip.id;
+    clipMenu.style.display = 'flex';
   }
 
   handleContextMenu(e) {

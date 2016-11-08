@@ -82,9 +82,13 @@ export default class Table extends Component {
   onMouseDown(e) {
     const METHOD_NAME = 'onMouseDown';
 
-    // hide the clip context menu
-    let clipMenu = document.getElementById('clip-menu');
-    if (clipMenu.style.display !== 'none') clipMenu.style.display = 'none';
+    // hide the clip context menu if a clip menu item wasnt pressed
+    // the menu will be hidden in the onclick function otherwise the onclick
+    // doesnt get triggered
+    if (e.srcElement.className !== 'clip-menu-item') {
+      let clipMenu = document.getElementById('clip-menu');
+      if (clipMenu.style.display !== 'none') clipMenu.style.display = 'none';
+    }
 
     // only left mouse button
     if (e.button !== 0) return;
@@ -128,6 +132,15 @@ export default class Table extends Component {
 
     e.stopPropagation();
     e.preventDefault();
+  }
+
+  handleClipMenuClick(e) {
+    let clipMenu = document.getElementById('clip-menu');
+    clipMenu.style.display = 'none';
+    const clipId = e.nativeEvent.srcElement.parentNode.dataset.clipId;
+    const option = e.nativeEvent.srcElement.dataset.option;
+
+    if (option === 'duplicate') console.log('duplicate clip');
   }
 
   updateClip(clipId, oldTrackNum, newTrackNum, newStartTime, isMovingLeft) {
@@ -183,7 +196,21 @@ export default class Table extends Component {
     // $log.d(CLASS_NAME, METHOD_NAME, 'Rendering');
     return (
       <div id="table-component">
-        <div id="clip-menu">HELLO</div>
+        <div id="clip-menu">
+          <button
+            className="clip-menu-item"
+            data-option="duplicate"
+            onClick={ this.handleClipMenuClick }>
+              Duplicate
+          </button>
+          <button
+            className="clip-menu-item"
+            data-option="delete"
+            onClick={ this.handleClipMenuClick }>
+            Delete
+          </button>
+        </div>
+
         { createTracks(this.props) }
       </div>
     );
