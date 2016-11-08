@@ -82,12 +82,16 @@ export default class Table extends Component {
   onMouseDown(e) {
     const METHOD_NAME = 'onMouseDown';
 
+    // hide the clip context menu
+    let clipMenu = document.getElementById('clip-menu');
+    if (clipMenu.style.display !== 'none') clipMenu.style.display = 'none';
+
     // only left mouse button
     if (e.button !== 0) return;
     let elem = e.srcElement;
     let clipId = getClipId(elem);
-    let trackNum = getClipTrackNum(elem);
     if (!clipId) return;
+    let trackNum = getClipTrackNum(elem);
     let pos = offset(elem);
     this.setState({
       dragging: { clipId, trackNum },
@@ -179,6 +183,7 @@ export default class Table extends Component {
     // $log.d(CLASS_NAME, METHOD_NAME, 'Rendering');
     return (
       <div id="table-component">
+        <div id="clip-menu">HELLO</div>
         { createTracks(this.props) }
       </div>
     );

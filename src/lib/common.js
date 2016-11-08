@@ -32,6 +32,14 @@ const common = {
 
   pxToTime: function (pixels) {
     return pixels * ProjectConstants.MS_PER_PIXEL;
+  },
+
+  numToPx: function (num) {
+    return `${num}px`;
+  },
+
+  pxToNum: function (pixels) {
+    return Number(pixels.split('px')[0]);
   }
 };
 
