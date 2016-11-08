@@ -47,6 +47,17 @@ const ACTION_HANDLERS = {
     let isMovingRight = oldClip.startTime < newClip.startTime;
     let isMovingLeft = !isMovingRight;
 
+
+    // grid snapping
+    let gridTimes = common.gridTimesAround(newClip.startTime, newClip.endTime, 4);
+    let snapTarget = _.find(gridTimes, t => Math.abs(newClip.startTime - t) < ProjectConstants.GRID_SNAP_THRESHOLD);
+    if(snapTarget != null) {
+      console.log(`snapping to ${snapTarget}`);
+      let width = common.getClipLength(newClip);
+      newClip.startTime = snapTarget;
+      newClip.endTime = newClip.startTime + width;
+    }
+
     // handle collision avoidance. not very efficient but should work.
     const adjustForCollisions = function (newClip, track) {
       let times = _(track).keys()

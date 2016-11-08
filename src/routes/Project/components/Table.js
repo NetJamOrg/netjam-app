@@ -138,7 +138,7 @@ export default class Table extends Component {
     const tableDiv = document.getElementById('table-component');
 
     let oldClip = this.props.tracks[oldTrackNum].clips[clipId];
-    let newClip = { ...oldClip };
+    let newClip = _.cloneDeep(oldClip);
 
     let clipTimeLength = newClip.endTime - newClip.startTime;
     newClip.startTime = newStartTime;
@@ -184,12 +184,11 @@ export default class Table extends Component {
   render() {
     const METHOD_NAME = 'render';
 
-    // $log.d(CLASS_NAME, METHOD_NAME, 'Rendering');
-    // TODO actual math here with interval, sig
-    // also don't scale backgroundSize with widthPx
+    let gridTimes = common.gridTimesAround(0, this.props.widthPx * ProjectConstants.MS_PER_PIXEL, this.props.timeInterval);
+    let gridWidth = this.props.numMeasures * this.props.timeInterval;
 
     return (
-      <div id="table-component" style={{width: this.props.widthPx, backgroundSize: `${this.props.widthPx / 10}px`}}>
+      <div id="table-component" style={{width: this.props.widthPx, backgroundSize: `${gridWidth}px`}}>
         { createTracks(this.props) }
       </div>
     );

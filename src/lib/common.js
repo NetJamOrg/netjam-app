@@ -32,7 +32,21 @@ const common = {
 
     pxToTime: function (pixels) {
         return pixels * ProjectConstants.MS_PER_PIXEL;
+    },
+
+  gridTimesAround: function (from, to, interval) {
+    let idx = 0;
+    let next = (i) => ProjectConstants.MS_PER_PIXEL * 4 * 4 * i; //(ProjectConstants.MS_PER_PIXEL * interval) * i;
+    let times = []
+    // spin up to 'from' location
+    while(next(idx) < from) idx++;
+    // build list of times
+    while(next(idx) < to) {
+      times.push(next(idx));
+      idx++;
     }
+    return times;
+  }
 };
 
 export default common;
