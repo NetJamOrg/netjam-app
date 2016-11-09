@@ -39,10 +39,18 @@ export function duplicateClip(clip) {
   };
 }
 
+export function dragDuplicateClip(clip, newId) {
+  return {
+    type: ProjectConstants.DRAG_DUPLICATE_CLIP,
+    payload: { ...clip, id: newId, ghostClip: true }
+  };
+}
+
 export const actions = {
   addClipToTrack,
   addTrack,
   removeTrack,
   updateClip,
-  duplicateClip
+  duplicateClip,
+  dragDuplicateClip
 };

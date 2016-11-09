@@ -4,6 +4,24 @@ import _ from 'lodash';
 import common from 'common';
 
 const ACTION_HANDLERS = {
+  [ProjectConstants.DRAG_DUPLICATE_CLIP]: (state, action) => {
+    const id = action.payload.id;
+    const track = action.payload.track;
+    const newClip = action.payload;
+
+    let newTrack = {
+      ...state[track],
+      [newClip.startTime]: id,
+      [newClip.endTime]: id,
+      clips: { ...state[track].clips, [id]: newClip }
+    };
+
+    return {
+      ...state,
+      [track]: newTrack
+    };
+  },
+
   [ProjectConstants.DUPLICATE_CLIP]: (state, action) => {
     const id = action.payload.id;
     const track = action.payload.track;
@@ -37,7 +55,8 @@ const ACTION_HANDLERS = {
     const startTime = action.payload.startTime;
     const endTime = action.payload.endTime;
     const track = action.payload.track;
-    const clip = { startTime, endTime, id, track };
+    const ghostClip = false;
+    const clip = { startTime, endTime, id, track, ghostClip };
 
     let edgeClip = getEdgeClipOnAdd(state[track], clip);
 

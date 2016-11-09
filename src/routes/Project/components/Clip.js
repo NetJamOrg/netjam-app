@@ -32,8 +32,9 @@ export default class Clip extends Component {
   }
 
   render() {
+    const className = `clip-component ${this.props.clip.ghostClip ? 'ghost-clip' : ''}`;
     return (
-      <div className="clip-component"
+      <div className={ className }
            id={ `clip-component-${this.props.clip.id}` }
            data-track={ this.props.clip.track }
            style={ clipStyle(this.props) }

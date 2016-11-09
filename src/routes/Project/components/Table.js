@@ -97,6 +97,14 @@ export default class Table extends Component {
     if (!clipId) return;
     let trackNum = getClipTrackNum(elem);
     let pos = offset(elem);
+
+    const altPressed = e.altKey;
+    if (altPressed) {
+      const newId = common.uuid();
+      this.props.dragDuplicateClip(this.props.tracks[trackNum].clips[clipId], newId);
+      clipId = newId;
+    }
+
     this.setState({
       dragging: { clipId, trackNum },
       rel: {
@@ -108,6 +116,7 @@ export default class Table extends Component {
         y: e.pageY
       }
     });
+
     e.stopPropagation();
     e.preventDefault();
   }
@@ -188,7 +197,6 @@ export default class Table extends Component {
         tableDiv.style.width = `${newWidth}px`;
       }
     }
-
   }
 
   render() {

@@ -1,11 +1,12 @@
 import { connect } from 'react-redux';
 
 import Table from '../components/Table';
-import { updateClip, duplicateClip } from '../actions/TrackActions';
+import { updateClip, duplicateClip, dragDuplicateClip } from '../actions/TrackActions';
 
 const mapDispatchToProps = {
   updateClip,
-  duplicateClip
+  duplicateClip,
+  dragDuplicateClip
 };
 
 const mapStateToProps = (state) => ({
