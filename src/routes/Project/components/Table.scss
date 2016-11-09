@@ -8,4 +8,11 @@
   margin-bottom: 50px;
   overflow: auto;
   background-image: linear-gradient(to right, #AAAAAA 1px, transparent 1px);
+
+  #clip-menu {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    flex-direction: column;
+  }
 }
