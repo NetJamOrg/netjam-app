@@ -139,7 +139,6 @@ export default class Table extends Component {
     clipMenu.style.display = 'none';
     const clipId = e.nativeEvent.srcElement.parentNode.dataset.clipId;
     const track = e.nativeEvent.srcElement.parentNode.dataset.track;
-    console.log(e.nativeEvent.srcElement.parentNode);
     const option = e.nativeEvent.srcElement.dataset.option;
 
     if (option === 'duplicate') this.props.duplicateClip(this.props.tracks[track].clips[clipId]);

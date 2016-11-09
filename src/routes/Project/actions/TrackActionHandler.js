@@ -16,7 +16,7 @@ const ACTION_HANDLERS = {
       endTime: oldClip.endTime + 1 + common.getClipLength(oldClip)
     };
 
-    adjustForCollisions(newClip, track, true);
+    adjustForCollisions(newClip, state[track], false);
     const edgeClip = getEdgeClipOnAdd(state[track], newClip);
     let newTrack = {
       ...state[track],
@@ -163,7 +163,7 @@ function adjustForCollisions(newClip, track, isMovingRight) {
       }
 
       // and recurse
-      adjustForCollisions(newClip, track);
+      adjustForCollisions(newClip, track, isMovingRight);
     }
   }
 }

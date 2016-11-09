@@ -23,8 +23,6 @@ export default class Clip extends Component {
     let table = document.getElementById('table-component');
     let endPx = common.timeToPx(this.props.clip.endTime);
 
-    console.log('component did mount', {endPx, table: table.clientWidth});
-
     if (endPx > table.clientWidth) {
       table.style.width = common.numToPx(endPx);
       if (table.clientWidth - document.body.clientWidth > document.body.scrollLeft) {
