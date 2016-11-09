@@ -138,9 +138,11 @@ export default class Table extends Component {
     let clipMenu = document.getElementById('clip-menu');
     clipMenu.style.display = 'none';
     const clipId = e.nativeEvent.srcElement.parentNode.dataset.clipId;
+    const track = e.nativeEvent.srcElement.parentNode.dataset.track;
+    console.log(e.nativeEvent.srcElement.parentNode);
     const option = e.nativeEvent.srcElement.dataset.option;
 
-    if (option === 'duplicate') console.log('duplicate clip');
+    if (option === 'duplicate') this.props.duplicateClip(this.props.tracks[track].clips[clipId]);
   }
 
   updateClip(clipId, oldTrackNum, newTrackNum, newStartTime, isMovingLeft) {
@@ -200,13 +202,13 @@ export default class Table extends Component {
           <button
             className="clip-menu-item"
             data-option="duplicate"
-            onClick={ this.handleClipMenuClick }>
+            onClick={ this.handleClipMenuClick.bind(this) }>
               Duplicate
           </button>
           <button
             className="clip-menu-item"
             data-option="delete"
-            onClick={ this.handleClipMenuClick }>
+            onClick={ this.handleClipMenuClick.bind(this) }>
             Delete
           </button>
         </div>

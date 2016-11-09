@@ -32,9 +32,17 @@ export function updateClip(oldClip, newClip) {
   };
 }
 
+export function duplicateClip(clip) {
+  return {
+    type: ProjectConstants.DUPLICATE_CLIP,
+    payload: clip
+  };
+}
+
 export const actions = {
   addClipToTrack,
   addTrack,
   removeTrack,
-  updateClip
+  updateClip,
+  duplicateClip
 };
