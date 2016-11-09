@@ -1,17 +1,34 @@
-import React from 'react';
+import React, { Component } from 'react';
 
 import './Clip.scss';
 
 import common from 'common';
 
-export const Clip = (props) => (
-  <div className="clip-component"
-       id= { `clip-component-${props.clip.id}` }
-       data-track={ props.clip.track }
-       style={ clipStyle(props) }>
+export default class Clip extends Component {
+  addMenu(x, y) {
+    let clipMenu = document.getElementById('clip-menu');
+    clipMenu.style.left = common.numToPx(x);
+    clipMenu.style.top = common.numToPx(y);
+    clipMenu.dataset.clipId = this.props.clip.id;
+    clipMenu.style.display = 'flex';
+  }
 
-  </div>
-);
+  handleContextMenu(e) {
+    e.preventDefault();
+    this.addMenu(e.clientX, e.clientY);
+  }
+
+  render() {
+    return (
+      <div className="clip-component"
+           id={ `clip-component-${this.props.clip.id}` }
+           data-track={ this.props.clip.track }
+           style={ clipStyle(this.props) }
+           onContextMenu={ this.handleContextMenu.bind(this) }>
+      </div>
+    );
+  }
+}
 
 /* Styles Functions */
 function clipStyle(props) {
@@ -21,7 +38,5 @@ function clipStyle(props) {
     width: `${common.getClipWidth(props.clip)}px`
   };
 }
-
-export default Clip;
 
 /* HELPERS */

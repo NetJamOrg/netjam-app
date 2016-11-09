@@ -7,4 +7,11 @@
   border-top: 1px solid black;
   margin-bottom: 50px;
   overflow: auto;
+
+  #clip-menu {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    flex-direction: column;
+  }
 }
