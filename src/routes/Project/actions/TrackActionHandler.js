@@ -88,12 +88,14 @@ const ACTION_HANDLERS = {
     let isMovingRight = oldClip.startTime < newClip.startTime;
     let isMovingLeft = !isMovingRight;
 
-    adjustForCollisions(newClip, track, isMovingRight);
+    if (!oldClip.ghostClip) adjustForCollisions(newClip, track, isMovingRight);
 
     if (_.isEqual(oldClip, newClip)) return state;
 
     let newTracks;
     if (oldClip.track !== newClip.track) {
+      if (oldClip.ghostClip) newClip.ghostClip = false;
+
       let oldTrack = { ...state[oldClip.track] };
       delete oldTrack[oldClip.startTime];
       delete oldTrack[oldClip.endTime];
@@ -116,6 +118,12 @@ const ACTION_HANDLERS = {
 
       newTracks[newClip.track].edgeClip = findEdgeClip(newTracks[newClip.track]);
     } else {
+      console.log('isColl', isCollision(newClip, state[newClip.track]), state[newClip.track]);
+
+      if (oldClip.ghostClip && !isCollision(newClip, state[newClip.track])) {
+        newClip.ghostClip = false;
+      }
+
       newTracks = {
         ...state,
         [newClip.track]: {
@@ -134,6 +142,7 @@ const ACTION_HANDLERS = {
       newTracks[newClip.track].edgeClip = findEdgeClip(newTracks[newClip.track]);
     }
 
+    console.log({ newTracks });
     return newTracks;
   }
 };
@@ -185,6 +194,25 @@ function adjustForCollisions(newClip, track, isMovingRight) {
       adjustForCollisions(newClip, track, isMovingRight);
     }
   }
+}
+
+function isCollision(newClip, track) {
+  let times = _(track).keys()
+    .map(Number)
+    .filter(_.isFinite)
+    .sortBy()
+    .value();
+
+  for (let time of times) {
+    let timeClip = track.clips[track[time]];
+    if (timeClip.id === newClip.id) continue;
+
+    if (newClip.endTime > timeClip.startTime && newClip.startTime <= timeClip.endTime) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 // this will only get the edge clip if the new clip was just added

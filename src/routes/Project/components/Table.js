@@ -154,6 +154,7 @@ export default class Table extends Component {
   }
 
   updateClip(clipId, oldTrackNum, newTrackNum, newStartTime, isMovingLeft) {
+    console.log('updateClip', clipId);
     const METHOD_NAME = 'updateClip';
 
     const tableDiv = document.getElementById('table-component');

@@ -40,6 +40,9 @@ export function duplicateClip(clip) {
 }
 
 export function dragDuplicateClip(clip, newId) {
+  clip.startTime += 1;
+  clip.endTime += 1;
+
   return {
     type: ProjectConstants.DRAG_DUPLICATE_CLIP,
     payload: { ...clip, id: newId, ghostClip: true }
