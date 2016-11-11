@@ -128,7 +128,6 @@ const ACTION_HANDLERS = {
       newTracks[newClip.track].edgeClip = findEdgeClip(newTracks[newClip.track]);
     }
 
-    console.log({ newTracks });
     return newTracks;
   }
 };
@@ -157,54 +156,60 @@ function findEdgeClip(track) {
 
 // handle collision avoidance. not very efficient but should work.
 function adjustForCollisions(newClip, track, isMovingRight) {
-  // let times = _(track).keys()
-  //   .map(Number)
-  //   .filter(_.isFinite)
-  //   .sortBy()
-  //   .value();
-  //
-  // for (let time of times) {
-  //   let timeClip = track.clips[track[time]];
-  //   if (timeClip.id === newClip.id) continue;
-  //   let clipLength = common.getClipLength(timeClip);
-  //
-  //   // for each clip, if the new clip ends after
-  //   // clip starts and the new clip starts before the clip ends
-  //   if (newClip.endTime > timeClip.startTime && newClip.startTime <= timeClip.endTime) {
-  //
-  //     // snap either to that clip's right or left,
-  //     // depending on direction of motion (if right, snap to left, etc)
-  //     if (isMovingRight) {
-  //       newClip.endTime = timeClip.startTime - 1;
-  //       newClip.startTime = timeClip.startTime - clipLength - 1;
-  //     } else {
-  //       newClip.endTime = timeClip.endTime + clipLength + 1;
-  //       newClip.startTime = timeClip.endTime + 1;
-  //     }
-  //
-  //     // and recurse
-  //     adjustForCollisions(newClip, track, isMovingRight);
-  //   }
-  // }
+  const times = _(track.clips).keys()
+    .reduce((acc, currTrackId) => {
+      let currTrack = track.clips[currTrackId];
+      acc.push({ time: Number(currTrack.startTime), id: currTrackId });
+      acc.push({ time: Number(currTrack.endTime), id: currTrackId });
+      return acc;
+    }, [])
+    .sort(sortAscendingTimeEntries);
+
+  for (let { id } of times) {
+    let timeClip = track.clips[id];
+    if (timeClip.id === newClip.id) continue;
+    let clipLength = common.getClipLength(timeClip);
+
+    // for each clip, if the new clip ends after
+    // clip starts and the new clip starts before the clip ends
+    if (newClip.endTime > timeClip.startTime && newClip.startTime <= timeClip.endTime) {
+
+      // snap either to that clip's right or left,
+      // depending on direction of motion (if right, snap to left, etc)
+      if (isMovingRight) {
+        newClip.endTime = timeClip.startTime - 1;
+        newClip.startTime = timeClip.startTime - clipLength - 1;
+      } else {
+        newClip.endTime = timeClip.endTime + clipLength + 1;
+        newClip.startTime = timeClip.endTime + 1;
+      }
+
+      // and recurse
+      adjustForCollisions(newClip, track, isMovingRight);
+    }
+  }
 }
 
 function isCollision(newClip, track) {
-  // let times = _(track).keys()
-  //   .map(Number)
-  //   .filter(_.isFinite)
-  //   .sortBy()
-  //   .value();
-  //
-  // for (let time of times) {
-  //   let timeClip = track.clips[track[time]];
-  //   if (timeClip.id === newClip.id) continue;
-  //
-  //   if (newClip.endTime > timeClip.startTime && newClip.startTime <= timeClip.endTime) {
-  //     return true;
-  //   }
-  // }
-  //
-  // return false;
+  const times = _(track.clips).keys()
+    .reduce((acc, currTrackId) => {
+      let currTrack = track.clips[currTrackId];
+      acc.push({ time: Number(currTrack.startTime), id: currTrackId });
+      acc.push({ time: Number(currTrack.endTime), id: currTrackId });
+      return acc;
+    }, [])
+    .sort(sortAscendingTimeEntries);
+
+  for (let { id } of times) {
+    let timeClip = track.clips[id];
+    if (timeClip.id === newClip.id) continue;
+
+    if (newClip.endTime > timeClip.startTime && newClip.startTime <= timeClip.endTime) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 // this will only get the edge clip if the new clip was just added
@@ -219,4 +224,9 @@ function getEdgeClipOnAdd(track, clip) {
   }
 
   return edgeClip;
+}
+
+/* HELPERS */
+function sortAscendingTimeEntries(a, b) {
+  return a.time - b.time;
 }
