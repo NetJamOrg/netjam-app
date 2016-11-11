@@ -82,13 +82,12 @@ const ACTION_HANDLERS = {
     let isMovingRight = oldClip.startTime < newClip.startTime;
     let isMovingLeft = !isMovingRight;
 
-    if (!oldClip.ghostClip) adjustForCollisions(newClip, track, isMovingRight);
-
     if (_.isEqual(oldClip, newClip)) return state;
 
     let newTracks;
-    if (oldClip.track !== newClip.track) {
-      // if (oldClip.ghostClip) newClip.ghostClip = false;
+    const collision = isCollision(newClip, state[newClip.track]);
+    if (oldClip.track !== newClip.track && !collision) {
+      if (oldClip.ghostClip) newClip.ghostClip = false;
 
       let oldTrack = { ...state[oldClip.track] };
       delete oldTrack.clips[id];
@@ -108,24 +107,28 @@ const ACTION_HANDLERS = {
 
       newTracks[newClip.track].edgeClip = findEdgeClip(newTracks[newClip.track]);
     } else {
-      // console.log('isColl', isCollision(newClip, state[newClip.track]), state[newClip.track]);
-      //
-      // if (oldClip.ghostClip && !isCollision(newClip, state[newClip.track])) {
-      //   newClip.ghostClip = false;
-      // }
+      if (collision) {
+        newClip.track = oldClip.track;
+      }
+
+      if (!oldClip.ghostClip) {
+        adjustForCollisions(newClip, state[oldClip.track], isMovingRight);
+      } else if (oldClip.ghostClip && !isCollision(newClip, state[oldClip.track])) {
+        newClip.ghostClip = false;
+      }
 
       newTracks = {
         ...state,
-        [newClip.track]: {
-          ...state[newClip.track],
+        [oldClip.track]: {
+          ...state[oldClip.track],
           clips: {
-            ...state[newClip.track].clips,
+            ...state[oldClip.track].clips,
             [id]: newClip
           }
         }
       };
 
-      newTracks[newClip.track].edgeClip = findEdgeClip(newTracks[newClip.track]);
+      newTracks[oldClip.track].edgeClip = findEdgeClip(newTracks[oldClip.track]);
     }
 
     return newTracks;

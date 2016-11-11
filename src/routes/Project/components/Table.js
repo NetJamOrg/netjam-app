@@ -92,6 +92,10 @@ export default class Table extends Component {
 
     // only left mouse button
     if (e.button !== 0) return;
+
+    // dont allow dragging on ctrl click since this brings up context menu
+    if (e.ctrlKey) return;
+
     let elem = e.srcElement;
     let clipId = getClipId(elem);
     if (!clipId) return;
@@ -268,8 +272,10 @@ function moveClip(e) {
   // Don't move clip past start
   if (newClipTime < 0) newClipTime = 0;
 
-  let clipId = this.state.dragging.clipId;
-  let trackNum = this.state.dragging.trackNum;
+  const clipId = this.state.dragging.clipId;
+  const clipElem = document.getElementById(`clip-component-${clipId}`);
+  const trackNum = clipElem.dataset.track;
+  const clip = this.props.tracks[trackNum].clips[clipId];
 
   let tableTop = offset(tableDiv).top;
   let trackHeight = trackDiv1.clientHeight;
@@ -279,7 +285,7 @@ function moveClip(e) {
   if (newTrackNum >= this.props.numTracks) newTrackNum = this.props.numTracks - 1;
   if (newTrackNum < 0) newTrackNum = 0;
 
-  const clip = this.props.tracks[trackNum].clips[clipId];
+
   const bodyWidth = document.body.clientWidth;
   const tableWidth = tableDiv.clientWidth;
 
@@ -331,7 +337,7 @@ function moveClip(e) {
 
   this.setState({
     pos,
-    dragging: { clipId, trackNum: newTrackNum },
+    dragging: { clipId },
     lastSeen,
     slidingClip
   });
