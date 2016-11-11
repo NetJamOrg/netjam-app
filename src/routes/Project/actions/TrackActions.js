@@ -49,11 +49,19 @@ export function dragDuplicateClip(clip, newId) {
   };
 }
 
+export function deleteClip(clip) {
+  return {
+    type: ProjectConstants.DELETE_CLIP,
+    payload: clip
+  };
+}
+
 export const actions = {
   addClipToTrack,
   addTrack,
   removeTrack,
   updateClip,
   duplicateClip,
-  dragDuplicateClip
+  dragDuplicateClip,
+  deleteClip
 };

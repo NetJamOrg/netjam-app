@@ -91,7 +91,7 @@ const ACTION_HANDLERS = {
 
       let oldTrack = { ...state[oldClip.track] };
       delete oldTrack.clips[id];
-      oldTrack.edgeClip = findEdgeClip(oldTrack);
+      oldTrack.edgeClip = findEdgeClip(oldTrack.clips);
 
       newTracks = {
         ...state,
@@ -105,7 +105,7 @@ const ACTION_HANDLERS = {
         }
       };
 
-      newTracks[newClip.track].edgeClip = findEdgeClip(newTracks[newClip.track]);
+      newTracks[newClip.track].edgeClip = findEdgeClip(newTracks[newClip.track].clips);
     } else {
       if (collision) {
         newClip.track = oldClip.track;
@@ -128,21 +128,36 @@ const ACTION_HANDLERS = {
         }
       };
 
-      newTracks[oldClip.track].edgeClip = findEdgeClip(newTracks[oldClip.track]);
+      newTracks[oldClip.track].edgeClip = findEdgeClip(newTracks[oldClip.track].clips);
     }
 
     return newTracks;
+  },
+
+  [ProjectConstants.DELETE_CLIP]: (state, action) => {
+    const clip = action.payload;
+    let newClips = { ...state[clip.track].clips };
+    delete newClips[clip.id];
+
+    return {
+      ...state,
+      [clip.track]: {
+        ...state[clip.track],
+        clips: newClips,
+        edgeClip: findEdgeClip(newClips)
+      }
+    };
   }
 };
 
 export default ACTION_HANDLERS;
 
 /* HELPERS */
-function findEdgeClip(track) {
+function findEdgeClip(clips) {
   let max;
   let maxClip;
-  for (let clipId in track.clips) {
-    let clip = track.clips[clipId];
+  for (let clipId in clips) {
+    let clip = clips[clipId];
     let time = clip.endTime;
     time = Number(time);
     if (typeof time === 'number' && !Number.isNaN(time)) {
@@ -229,7 +244,6 @@ function getEdgeClipOnAdd(track, clip) {
   return edgeClip;
 }
 
-/* HELPERS */
 function sortAscendingTimeEntries(a, b) {
   return a.time - b.time;
 }
