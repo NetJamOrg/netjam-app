@@ -102,9 +102,8 @@ export default class Table extends Component {
     let trackNum = getClipTrackNum(elem);
     let pos = offset(elem);
 
-    const tableDiv = document.getElementById('table-component');
     // so when your mouse moves faster than clip doesn't change from pointer
-    tableDiv.style.cursor = 'pointer';
+    document.body.style.cursor = 'pointer';
 
     const altPressed = e.altKey;
     if (altPressed) {
@@ -132,16 +131,16 @@ export default class Table extends Component {
   onMouseUp(e) {
     const METHOD_NAME = 'onMouseUp';
 
-    const clip = getClipFromId(this.state.dragging.clipId, this.props);
-    if (clip.ghostClip) {
-      this.props.deleteClip(clip);
-    }
-
     if (this.state.dragging) {
-      const tableDiv = document.getElementById('table-component');
-      tableDiv.style.cursor = 'initial';
+      const clip = getClipFromId(this.state.dragging.clipId, this.props);
+      if (clip.ghostClip) {
+        this.props.deleteClip(clip);
+      }
+
+      document.body.style.cursor = 'initial';
       this.setState({ dragging: false });
     }
+
     if (this.state.slidingClip) {
       clearInterval(this.state.slidingClip);
       this.setState({ slidingClip: false });
