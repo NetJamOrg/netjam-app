@@ -102,6 +102,10 @@ export default class Table extends Component {
     let trackNum = getClipTrackNum(elem);
     let pos = offset(elem);
 
+    const tableDiv = document.getElementById('table-component');
+    // so when your mouse moves faster than clip doesn't change from pointer
+    tableDiv.style.cursor = 'pointer';
+
     const altPressed = e.altKey;
     if (altPressed) {
       const newId = common.uuid();
@@ -128,7 +132,16 @@ export default class Table extends Component {
   onMouseUp(e) {
     const METHOD_NAME = 'onMouseUp';
 
-    if (this.state.dragging) this.setState({ dragging: false });
+    const clip = getClipFromId(this.state.dragging.clipId, this.props);
+    if (clip.ghostClip) {
+      this.props.deleteClip(clip);
+    }
+
+    if (this.state.dragging) {
+      const tableDiv = document.getElementById('table-component');
+      tableDiv.style.cursor = 'initial';
+      this.setState({ dragging: false });
+    }
     if (this.state.slidingClip) {
       clearInterval(this.state.slidingClip);
       this.setState({ slidingClip: false });
@@ -246,13 +259,12 @@ function createTracks(props) {
 
 /* EVENT HANDLERS */
 function moveClip(e) {
-
   const FUNCTION_NAME = 'moveClip';
+
+  if (!this.state.dragging) return false;
 
   const tableDiv = document.getElementById('table-component');
   const trackDiv1 = document.getElementById('track-component-1');
-
-  if (!this.state.dragging) return false;
 
   let pos = {
     x: e.pageX - this.state.rel.x,
@@ -272,10 +284,7 @@ function moveClip(e) {
   // Don't move clip past start
   if (newClipTime < 0) newClipTime = 0;
 
-  const clipId = this.state.dragging.clipId;
-  const clipElem = document.getElementById(`clip-component-${clipId}`);
-  const trackNum = clipElem.dataset.track;
-  const clip = this.props.tracks[trackNum].clips[clipId];
+  const clip = getClipFromId(this.state.dragging.clipId, this.props);
 
   let tableTop = offset(tableDiv).top;
   let trackHeight = trackDiv1.clientHeight;
@@ -285,13 +294,12 @@ function moveClip(e) {
   if (newTrackNum >= this.props.numTracks) newTrackNum = this.props.numTracks - 1;
   if (newTrackNum < 0) newTrackNum = 0;
 
-
   const bodyWidth = document.body.clientWidth;
   const tableWidth = tableDiv.clientWidth;
 
   let slidingClip = this.state.slidingClip;
 
-  if (newTrackNum !== trackNum) {
+  if (newTrackNum !== clip.track) {
     if (slidingClip) {
       clearInterval(slidingClip);
       slidingClip = false;
@@ -306,26 +314,26 @@ function moveClip(e) {
       }
 
       document.body.scrollLeft += common.timeToPx(ProjectConstants.SLIDE_TIME);
-      this.updateClip(clipId, trackNum, newTrackNum, newClipTime, isMovingLeft);
+      this.updateClip(clip.id, clip.track, newTrackNum, newClipTime, isMovingLeft);
     }, ProjectConstants.SLIDE_INTERVAL_TIME);
 
   const setSlideLeftInterval = () => setInterval(() => {
     newClipTime -= ProjectConstants.SLIDE_TIME;
     if (newClipTime < 0) newClipTime = 0;
     document.body.scrollLeft -= common.timeToPx(ProjectConstants.SLIDE_TIME);
-    this.updateClip(clipId, trackNum, newTrackNum, newClipTime, isMovingLeft);
+    this.updateClip(clip.id, clip.track, newTrackNum, newClipTime, isMovingLeft);
   }, ProjectConstants.SLIDE_INTERVAL_TIME);
 
   if (newClipTime >= common.pxToTime(document.body.scrollLeft + bodyWidth) - common.getClipLength(clip)) {
     newClipTime = common.pxToTime(document.body.scrollLeft + bodyWidth) - common.getClipLength(clip);
 
-    if (!slidingClip && newTrackNum === trackNum) {
+    if (!slidingClip && newTrackNum === clip.track) {
       slidingClip = setSlideRightInterval();
     }
   } else if (newClipTime <= common.pxToTime(document.body.scrollLeft)) {
     newClipTime = common.pxToTime(document.body.scrollLeft);
 
-    if (!slidingClip && newTrackNum === trackNum) {
+    if (!slidingClip && newTrackNum === clip.track) {
       slidingClip = setSlideLeftInterval();
     }
   } else {
@@ -337,15 +345,15 @@ function moveClip(e) {
 
   this.setState({
     pos,
-    dragging: { clipId },
+    dragging: { clipId: clip.id },
     lastSeen,
     slidingClip
   });
 
   if (clip.startTime === newClipTime
-    && newTrackNum === trackNum) return;
+    && newTrackNum === clip.track) return;
 
-  this.updateClip(clipId, trackNum, newTrackNum, newClipTime, isMovingLeft);
+  this.updateClip(clip.id, clip.track, newTrackNum, newClipTime, isMovingLeft);
 
 }
 
@@ -385,4 +393,11 @@ function getClipId(elem) {
 function getClipTrackNum(elem) {
   if (!elem) return null;
   return elem.dataset.track;
+}
+
+function getClipFromId(clipId, props) {
+  const clipElem = document.getElementById(`clip-component-${clipId}`);
+  const trackNum = clipElem.dataset.track;
+
+  return props.tracks[trackNum].clips[clipId];
 }
