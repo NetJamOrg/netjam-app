@@ -42,7 +42,7 @@ const common = {
     return Number(pixels.split('px')[0]);
   },
 
-  iterateObject: function* (obj) {
+  iterObj: function* (obj) {
     for (let key in obj) {
       if (obj.hasOwnProperty(key)) {
         yield obj[key];

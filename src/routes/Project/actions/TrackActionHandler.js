@@ -155,7 +155,7 @@ export default ACTION_HANDLERS;
 /* HELPERS */
 function findEdgeClip(clips) {
   let maxClip = null;
-  for (let clip of common.iterateObject(clips)) {
+  for (let clip of common.iterObj(clips)) {
     if (!maxClip || clip.endTime > maxClip.endTime) {
       maxClip = clip;
     }
@@ -166,7 +166,7 @@ function findEdgeClip(clips) {
 
 // handle collision avoidance. not very efficient but should work.
 function adjustForCollisions(newClip, track, isMovingRight) {
-  for (let timeClip of common.iterateObject(track.clips)) {
+  for (let timeClip of common.iterObj(track.clips)) {
     if (timeClip.id === newClip.id) continue;
     let clipLength = common.getClipLength(timeClip);
 
@@ -191,7 +191,7 @@ function adjustForCollisions(newClip, track, isMovingRight) {
 }
 
 function isCollision(newClip, track) {
-  for (let timeClip of common.iterateObject(track.clips)) {
+  for (let timeClip of common.iterObj(track.clips)) {
     if (timeClip.id === newClip.id) continue;
 
     if (newClip.endTime > timeClip.startTime && newClip.startTime <= timeClip.endTime) {
