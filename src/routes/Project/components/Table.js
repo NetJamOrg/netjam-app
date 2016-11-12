@@ -92,11 +92,26 @@ export default class Table extends Component {
 
     // only left mouse button
     if (e.button !== 0) return;
+
+    // dont allow dragging on ctrl click since this brings up context menu
+    if (e.ctrlKey) return;
+
     let elem = e.srcElement;
     let clipId = getClipId(elem);
     if (!clipId) return;
     let trackNum = getClipTrackNum(elem);
     let pos = offset(elem);
+
+    // so when your mouse moves faster than clip doesn't change from pointer
+    document.body.style.cursor = 'pointer';
+
+    const altPressed = e.altKey;
+    if (altPressed) {
+      const newId = common.uuid();
+      this.props.dragDuplicateClip(this.props.tracks[trackNum].clips[clipId], newId);
+      clipId = newId;
+    }
+
     this.setState({
       dragging: { clipId, trackNum },
       rel: {
@@ -108,6 +123,7 @@ export default class Table extends Component {
         y: e.pageY
       }
     });
+
     e.stopPropagation();
     e.preventDefault();
   }
@@ -115,7 +131,16 @@ export default class Table extends Component {
   onMouseUp(e) {
     const METHOD_NAME = 'onMouseUp';
 
-    if (this.state.dragging) this.setState({ dragging: false });
+    if (this.state.dragging) {
+      const clip = getClipFromId(this.state.dragging.clipId, this.props);
+      if (clip.ghostClip) {
+        this.props.deleteClip(clip);
+      }
+
+      document.body.style.cursor = 'initial';
+      this.setState({ dragging: false });
+    }
+
     if (this.state.slidingClip) {
       clearInterval(this.state.slidingClip);
       this.setState({ slidingClip: false });
@@ -138,9 +163,10 @@ export default class Table extends Component {
     let clipMenu = document.getElementById('clip-menu');
     clipMenu.style.display = 'none';
     const clipId = e.nativeEvent.srcElement.parentNode.dataset.clipId;
+    const track = e.nativeEvent.srcElement.parentNode.dataset.track;
     const option = e.nativeEvent.srcElement.dataset.option;
 
-    if (option === 'duplicate') console.log('duplicate clip');
+    if (option === 'duplicate') this.props.duplicateClip(this.props.tracks[track].clips[clipId]);
   }
 
   updateClip(clipId, oldTrackNum, newTrackNum, newStartTime, isMovingLeft) {
@@ -187,7 +213,6 @@ export default class Table extends Component {
         tableDiv.style.width = `${newWidth}px`;
       }
     }
-
   }
 
   render() {
@@ -200,13 +225,13 @@ export default class Table extends Component {
           <button
             className="clip-menu-item"
             data-option="duplicate"
-            onClick={ this.handleClipMenuClick }>
+            onClick={ this.handleClipMenuClick.bind(this) }>
               Duplicate
           </button>
           <button
             className="clip-menu-item"
             data-option="delete"
-            onClick={ this.handleClipMenuClick }>
+            onClick={ this.handleClipMenuClick.bind(this) }>
             Delete
           </button>
         </div>
@@ -233,13 +258,12 @@ function createTracks(props) {
 
 /* EVENT HANDLERS */
 function moveClip(e) {
-
   const FUNCTION_NAME = 'moveClip';
+
+  if (!this.state.dragging) return false;
 
   const tableDiv = document.getElementById('table-component');
   const trackDiv1 = document.getElementById('track-component-1');
-
-  if (!this.state.dragging) return false;
 
   let pos = {
     x: e.pageX - this.state.rel.x,
@@ -259,8 +283,7 @@ function moveClip(e) {
   // Don't move clip past start
   if (newClipTime < 0) newClipTime = 0;
 
-  let clipId = this.state.dragging.clipId;
-  let trackNum = this.state.dragging.trackNum;
+  const clip = getClipFromId(this.state.dragging.clipId, this.props);
 
   let tableTop = offset(tableDiv).top;
   let trackHeight = trackDiv1.clientHeight;
@@ -270,13 +293,12 @@ function moveClip(e) {
   if (newTrackNum >= this.props.numTracks) newTrackNum = this.props.numTracks - 1;
   if (newTrackNum < 0) newTrackNum = 0;
 
-  const clip = this.props.tracks[trackNum].clips[clipId];
   const bodyWidth = document.body.clientWidth;
   const tableWidth = tableDiv.clientWidth;
 
   let slidingClip = this.state.slidingClip;
 
-  if (newTrackNum !== trackNum) {
+  if (newTrackNum !== clip.track) {
     if (slidingClip) {
       clearInterval(slidingClip);
       slidingClip = false;
@@ -291,26 +313,26 @@ function moveClip(e) {
       }
 
       document.body.scrollLeft += common.timeToPx(ProjectConstants.SLIDE_TIME);
-      this.updateClip(clipId, trackNum, newTrackNum, newClipTime, isMovingLeft);
+      this.updateClip(clip.id, clip.track, newTrackNum, newClipTime, isMovingLeft);
     }, ProjectConstants.SLIDE_INTERVAL_TIME);
 
   const setSlideLeftInterval = () => setInterval(() => {
     newClipTime -= ProjectConstants.SLIDE_TIME;
     if (newClipTime < 0) newClipTime = 0;
     document.body.scrollLeft -= common.timeToPx(ProjectConstants.SLIDE_TIME);
-    this.updateClip(clipId, trackNum, newTrackNum, newClipTime, isMovingLeft);
+    this.updateClip(clip.id, clip.track, newTrackNum, newClipTime, isMovingLeft);
   }, ProjectConstants.SLIDE_INTERVAL_TIME);
 
   if (newClipTime >= common.pxToTime(document.body.scrollLeft + bodyWidth) - common.getClipLength(clip)) {
     newClipTime = common.pxToTime(document.body.scrollLeft + bodyWidth) - common.getClipLength(clip);
 
-    if (!slidingClip && newTrackNum === trackNum) {
+    if (!slidingClip && newTrackNum === clip.track) {
       slidingClip = setSlideRightInterval();
     }
   } else if (newClipTime <= common.pxToTime(document.body.scrollLeft)) {
     newClipTime = common.pxToTime(document.body.scrollLeft);
 
-    if (!slidingClip && newTrackNum === trackNum) {
+    if (!slidingClip && newTrackNum === clip.track) {
       slidingClip = setSlideLeftInterval();
     }
   } else {
@@ -322,15 +344,15 @@ function moveClip(e) {
 
   this.setState({
     pos,
-    dragging: { clipId, trackNum: newTrackNum },
+    dragging: { clipId: clip.id },
     lastSeen,
     slidingClip
   });
 
   if (clip.startTime === newClipTime
-    && newTrackNum === trackNum) return;
+    && newTrackNum === clip.track) return;
 
-  this.updateClip(clipId, trackNum, newTrackNum, newClipTime, isMovingLeft);
+  this.updateClip(clip.id, clip.track, newTrackNum, newClipTime, isMovingLeft);
 
 }
 
@@ -370,4 +392,11 @@ function getClipId(elem) {
 function getClipTrackNum(elem) {
   if (!elem) return null;
   return elem.dataset.track;
+}
+
+function getClipFromId(clipId, props) {
+  const clipElem = document.getElementById(`clip-component-${clipId}`);
+  const trackNum = clipElem.dataset.track;
+
+  return props.tracks[trackNum].clips[clipId];
 }

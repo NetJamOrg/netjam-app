@@ -1,13 +1,13 @@
 import ProjectConstants from '../routes/Project/constants';
 
 const common = {
-  getRandomIntInclusive: function (min, max) {
+  getRandomIntInclusive(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
   },
 
-  uuid: function () {
+  uuid() {
     function s4() {
       return Math.floor((1 + Math.random()) * 0x10000)
         .toString(16)
@@ -18,28 +18,36 @@ const common = {
       s4() + '-' + s4() + s4() + s4();
   },
 
-  timeToPx: function (time) {
+  timeToPx(time) {
     return time / ProjectConstants.MS_PER_PIXEL;
   },
 
-  getClipWidth: function (clip) {
+  getClipWidth(clip) {
     return this.timeToPx(clip.endTime - clip.startTime);
   },
 
-  getClipLength: function (clip) {
+  getClipLength(clip) {
     return clip.endTime - clip.startTime;
   },
 
-  pxToTime: function (pixels) {
+  pxToTime(pixels) {
     return pixels * ProjectConstants.MS_PER_PIXEL;
   },
 
-  numToPx: function (num) {
+  numToPx(num) {
     return `${num}px`;
   },
 
-  pxToNum: function (pixels) {
+  pxToNum(pixels) {
     return Number(pixels.split('px')[0]);
+  },
+
+  iterObj: function* (obj) {
+    for (let key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        yield obj[key];
+      }
+    }
   }
 };
 

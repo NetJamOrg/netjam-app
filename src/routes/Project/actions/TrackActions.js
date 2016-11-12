@@ -32,9 +32,36 @@ export function updateClip(oldClip, newClip) {
   };
 }
 
+export function duplicateClip(clip) {
+  return {
+    type: ProjectConstants.DUPLICATE_CLIP,
+    payload: clip
+  };
+}
+
+export function dragDuplicateClip(clip, newId) {
+  clip.startTime += 1;
+  clip.endTime += 1;
+
+  return {
+    type: ProjectConstants.DRAG_DUPLICATE_CLIP,
+    payload: { ...clip, id: newId, ghostClip: true }
+  };
+}
+
+export function deleteClip(clip) {
+  return {
+    type: ProjectConstants.DELETE_CLIP,
+    payload: clip
+  };
+}
+
 export const actions = {
   addClipToTrack,
   addTrack,
   removeTrack,
-  updateClip
+  updateClip,
+  duplicateClip,
+  dragDuplicateClip,
+  deleteClip
 };

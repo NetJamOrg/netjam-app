@@ -4,28 +4,63 @@ import _ from 'lodash';
 import common from 'common';
 
 const ACTION_HANDLERS = {
+  [ProjectConstants.DRAG_DUPLICATE_CLIP]: (state, action) => {
+    const id = action.payload.id;
+    const track = action.payload.track;
+    const newClip = action.payload;
+
+    let newTrack = {
+      ...state[track],
+      clips: { ...state[track].clips, [id]: newClip }
+    };
+
+    return {
+      ...state,
+      [track]: newTrack
+    };
+  },
+
+  [ProjectConstants.DUPLICATE_CLIP]: (state, action) => {
+    const id = action.payload.id;
+    const track = action.payload.track;
+    const oldClip = state[track].clips[id];
+    const newId = common.uuid();
+    const newClip = {
+      ...oldClip,
+      id: newId,
+      startTime: oldClip.endTime + 1,
+      endTime: oldClip.endTime + 1 + common.getClipLength(oldClip)
+    };
+
+    adjustForCollisions(newClip, state[track], false);
+    const edgeClip = getEdgeClipOnAdd(state[track], newClip);
+    let newTrack = {
+      ...state[track],
+      clips: { ...state[track].clips, [newId]: newClip },
+      edgeClip
+    };
+
+    return {
+      ...state,
+      [track]: newTrack
+    };
+  },
+
   [ProjectConstants.ADD_CLIP_TO_TRACK]: (state, action) => {
     const id = action.payload.id;
     const startTime = action.payload.startTime;
     const endTime = action.payload.endTime;
     const track = action.payload.track;
-    const clip = { startTime, endTime, id, track };
+    const ghostClip = false;
+    const clip = { startTime, endTime, id, track, ghostClip };
 
-    let edgeClip;
-    if (!state[track].edgeClip) {
-      edgeClip = clip;
-    } else if (state[track].edgeClip.endTime >= endTime) {
-      edgeClip = state[track].edgeClip;
-    } else {
-      edgeClip = clip;
-    }
+    let edgeClip = getEdgeClipOnAdd(state[track], clip);
 
     return {
       ...state,  [track]: {
         ...state[track],
-        [startTime]: id,
-        [endTime]: id,
-        clips: { ...state[track].clips, [id]: clip }, edgeClip
+        clips: { ...state[track].clips, [id]: clip },
+        edgeClip
       }
     };
   },
@@ -47,58 +82,22 @@ const ACTION_HANDLERS = {
     let isMovingRight = oldClip.startTime < newClip.startTime;
     let isMovingLeft = !isMovingRight;
 
-    // handle collision avoidance. not very efficient but should work.
-    const adjustForCollisions = function (newClip, track) {
-      let times = _(track).keys()
-        .map(Number)
-        .filter(_.isFinite)
-        .sortBy()
-        .value();
-
-      for (let time of times) {
-        let timeClip = track.clips[track[time]];
-        if (timeClip.id === newClip.id) continue;
-        let clipLength = common.getClipLength(timeClip);
-
-        // for each clip, if the new clip ends after
-        // clip starts and the new clip starts before the clip ends
-        if (newClip.endTime > timeClip.startTime && newClip.startTime <= timeClip.endTime) {
-
-          // snap either to that clip's right or left,
-          // depending on direction of motion (if right, snap to left, etc)
-          if (isMovingRight) {
-            newClip.endTime = timeClip.startTime - 1;
-            newClip.startTime = timeClip.startTime - clipLength - 1;
-          } else {
-            newClip.endTime = timeClip.endTime + clipLength + 1;
-            newClip.startTime = timeClip.endTime + 1;
-          }
-
-          // and recurse
-          adjustForCollisions(newClip, track);
-        }
-      }
-    };
-
-    adjustForCollisions(newClip, track);
-
     if (_.isEqual(oldClip, newClip)) return state;
 
     let newTracks;
-    if (oldClip.track !== newClip.track) {
+    const collision = isCollision(newClip, state[newClip.track]);
+    if (oldClip.track !== newClip.track && !collision) {
+      if (oldClip.ghostClip) newClip.ghostClip = false;
+
       let oldTrack = { ...state[oldClip.track] };
-      delete oldTrack[oldClip.startTime];
-      delete oldTrack[oldClip.endTime];
       delete oldTrack.clips[id];
-      oldTrack.edgeClip = findEdgeClip(oldTrack);
+      oldTrack.edgeClip = findEdgeClip(oldTrack.clips);
 
       newTracks = {
         ...state,
         [oldClip.track]: oldTrack,
         [newClip.track]: {
           ...state[newClip.track],
-          [newClip.startTime]: id,
-          [newClip.endTime]: id,
           clips: {
             ...state[newClip.track].clips,
             [id]: newClip
@@ -106,42 +105,113 @@ const ACTION_HANDLERS = {
         }
       };
 
-      newTracks[newClip.track].edgeClip = findEdgeClip(newTracks[newClip.track]);
+      newTracks[newClip.track].edgeClip = findEdgeClip(newTracks[newClip.track].clips);
     } else {
+      if (collision) {
+        newClip.track = oldClip.track;
+      }
+
+      if (!oldClip.ghostClip) {
+        adjustForCollisions(newClip, state[oldClip.track], isMovingRight);
+      } else if (oldClip.ghostClip && !isCollision(newClip, state[oldClip.track])) {
+        newClip.ghostClip = false;
+      }
+
       newTracks = {
         ...state,
-        [newClip.track]: {
-          ...state[newClip.track],
-          [newClip.startTime]: id,
-          [newClip.endTime]: id,
+        [oldClip.track]: {
+          ...state[oldClip.track],
           clips: {
-            ...state[newClip.track].clips,
+            ...state[oldClip.track].clips,
             [id]: newClip
           }
         }
       };
 
-      delete newTracks[newClip.track][oldClip.startTime];
-      delete newTracks[newClip.track][oldClip.endTime];
-      newTracks[newClip.track].edgeClip = findEdgeClip(newTracks[newClip.track]);
+      newTracks[oldClip.track].edgeClip = findEdgeClip(newTracks[oldClip.track].clips);
     }
 
     return newTracks;
+  },
+
+  [ProjectConstants.DELETE_CLIP]: (state, action) => {
+    const clip = action.payload;
+    let newClips = { ...state[clip.track].clips };
+    delete newClips[clip.id];
+
+    return {
+      ...state,
+      [clip.track]: {
+        ...state[clip.track],
+        clips: newClips,
+        edgeClip: findEdgeClip(newClips)
+      }
+    };
   }
 };
 
 export default ACTION_HANDLERS;
 
 /* HELPERS */
-function findEdgeClip(track) {
-  let max;
-  for (let time in track) {
-    time = Number(time);
-    if (typeof time === 'number' && !Number.isNaN(time)) {
-      if (!max || time > max) max = time;
+function findEdgeClip(clips) {
+  let maxClip = null;
+  for (let clip of common.iterObj(clips)) {
+    if (!maxClip || clip.endTime > maxClip.endTime) {
+      maxClip = clip;
     }
   }
 
-  if (!max) return null;
-  return track.clips[track[max]];
+  return maxClip;
+}
+
+// handle collision avoidance. not very efficient but should work.
+function adjustForCollisions(newClip, track, isMovingRight) {
+  for (let timeClip of common.iterObj(track.clips)) {
+    if (timeClip.id === newClip.id) continue;
+    let clipLength = common.getClipLength(timeClip);
+
+    // for each clip, if the new clip ends after
+    // clip starts and the new clip starts before the clip ends
+    if (newClip.endTime > timeClip.startTime && newClip.startTime <= timeClip.endTime) {
+
+      // snap either to that clip's right or left,
+      // depending on direction of motion (if right, snap to left, etc)
+      if (isMovingRight) {
+        newClip.endTime = timeClip.startTime - 1;
+        newClip.startTime = timeClip.startTime - clipLength - 1;
+      } else {
+        newClip.endTime = timeClip.endTime + clipLength + 1;
+        newClip.startTime = timeClip.endTime + 1;
+      }
+
+      // and recurse
+      adjustForCollisions(newClip, track, isMovingRight);
+    }
+  }
+}
+
+function isCollision(newClip, track) {
+  for (let timeClip of common.iterObj(track.clips)) {
+    if (timeClip.id === newClip.id) continue;
+
+    if (newClip.endTime > timeClip.startTime && newClip.startTime <= timeClip.endTime) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+// this will only get the edge clip if the new clip was just added
+function getEdgeClipOnAdd(track, clip) {
+  let edgeClip;
+  if (!track.edgeClip) {
+    edgeClip = clip;
+  } else if (track.edgeClip.endTime >= clip.endTime) {
+    edgeClip = track.edgeClip;
+  } else {
+    edgeClip = clip;
+  }
+
+  return edgeClip;
 }
