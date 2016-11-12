@@ -7,7 +7,7 @@ const initialState = {
   numMeasures: 4
 };
 export default function tableReducer(state = initialState, action) {
-    const handler = ACTION_HANDLERS[action.type];
+  const handler = ACTION_HANDLERS[action.type];
 
-    return handler ? handler(state, action) : state;
+  return handler ? handler(state, action) : state;
 }

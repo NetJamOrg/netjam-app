@@ -39,23 +39,24 @@ const ACTION_HANDLERS = {
 
     const oldClip = action.payload.oldClip;
     const newClip = action.payload.newClip;
-    const tableInfo = action.payload.tableInfo;
+    const lineSpacingTime = common.pxToTime(action.payload.lineSpacingPx);
+    const updateClipLength = common.getClipLength(newClip);
     const id = oldClip.id;
 
     if (_.isEqual(oldClip, newClip)) return state;
 
     let track = state[newClip.track];
-    let isMovingRight = oldClip.startTime < newClip.startTime;
-    let isMovingLeft = !isMovingRight;
+    const isMovingRight = oldClip.startTime < newClip.startTime;
+    const isMovingLeft = !isMovingRight;
 
     // grid snapping
-    let gridTimes = gridTimesAround(newClip.startTime, newClip.endTime, tableInfo);
-    let snapTarget = _.find(gridTimes, t => Math.abs(newClip.startTime - t) < ProjectConstants.GRID_SNAP_THRESHOLD);
-    if (snapTarget != null) {
-      let width = common.getClipLength(newClip);
-      newClip.startTime = snapTarget;
-      newClip.endTime = newClip.startTime + width;
-    }
+    const intervalRemainer = (newClip.startTime / lineSpacingTime) % 1;
+    console.log(intervalRemainer, lineSpacingTime);
+    let interval = Math.floor(newClip.startTime / lineSpacingTime);
+    interval = intervalRemainer < ProjectConstants.GRID_SNAP_THRESHOLD ? interval : interval + 1;
+    newClip.startTime = interval * lineSpacingTime;
+    newClip.endTime = newClip.startTime + updateClipLength;
+    console.log(newClip);
 
     // handle collision avoidance. not very efficient but should work.
     const adjustForCollisions = function (newClip, track) {
@@ -154,22 +155,4 @@ function findEdgeClip(track) {
 
   if (!max) return null;
   return track.clips[track[max]];
-}
-
-// return grid time locations between from and to
-function gridTimesAround(from, to, { numMeasures, timeInterval }) {
-  let idx = 0;
-  let next = (i) => ProjectConstants.MS_PER_PIXEL * numMeasures * timeInterval * i;
-  let times = [];
-
-  // spin up to 'from' location
-  while (next(idx) < from) idx++;
-
-  // build list of times
-  while (next(idx) < to) {
-    times.push(next(idx));
-    idx++;
-  }
-
-  return times;
 }

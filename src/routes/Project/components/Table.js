@@ -159,9 +159,9 @@ export default class Table extends Component {
     newClip.endTime = newStartTime + clipTimeLength;
     newClip.track = newTrackNum;
 
-    this.props.updateClip(oldClip, newClip,
-                          { numMeasures: this.props.numMeasures,
-                          timeInterval: this.props.timeInterval });
+    const lineSpacingPx = this.props.numMeasures * this.props.timeInterval;
+
+    this.props.updateClip(oldClip, newClip, lineSpacingPx);
 
     const getMostEdgeClip = () => {
       let mostEdgeClip;
@@ -198,10 +198,10 @@ export default class Table extends Component {
   render() {
     const METHOD_NAME = 'render';
 
-    let gridWidth = this.props.numMeasures * this.props.timeInterval;
+    const lineSpacingPx = this.props.numMeasures * this.props.timeInterval;
 
     return (
-      <div id="table-component" style={{ backgroundSize: `${gridWidth}px` }}>
+      <div id="table-component" style={{ backgroundSize: `${lineSpacingPx}px` }}>
         <div id="clip-menu">
           <button
             className="clip-menu-item"

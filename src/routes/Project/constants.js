@@ -10,7 +10,7 @@ const CLIP_MOVE_THROTTLE = 40;
 const SLIDE_INTERVAL_TIME = 40;
 const SLIDE_TIME = 500;
 const RESIZE_THROTTLE = 10;
-const GRID_SNAP_THRESHOLD = 1000;
+const GRID_SNAP_THRESHOLD = 0.5;
 
 export default {
   UPDATE_CLIP,
@@ -24,4 +24,4 @@ export default {
   SLIDE_TIME,
   RESIZE_THROTTLE,
   GRID_SNAP_THRESHOLD
-}
+};
