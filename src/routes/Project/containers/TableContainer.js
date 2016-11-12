@@ -2,7 +2,6 @@ import { connect } from 'react-redux';
 
 import Table from '../components/Table';
 import { updateClip } from '../actions/TrackActions';
-import { resizeTable } from '../actions/TableActions';
 
 const mapDispatchToProps = {
   updateClip,
