@@ -154,23 +154,19 @@ export default ACTION_HANDLERS;
 
 /* HELPERS */
 function findEdgeClip(clips) {
-  var maxClipId = _.maxBy(Object.keys(clips), (id) => clips[id].endTime);
-  return clips[maxClipId];
+  let maxClip = null;
+  for (let clip of common.iterateObject(clips)) {
+    if (!maxClip || clip.endTime > maxClip.endTime) {
+      maxClip = clip;
+    }
+  }
+
+  return maxClip;
 }
 
 // handle collision avoidance. not very efficient but should work.
 function adjustForCollisions(newClip, track, isMovingRight) {
-  const times = _(track.clips).keys()
-    .reduce((acc, currClipId) => {
-      let currTrack = track.clips[currClipId];
-      acc.push({ time: Number(currTrack.startTime), id: currClipId });
-      acc.push({ time: Number(currTrack.endTime), id: currClipId });
-      return acc;
-    }, [])
-    .sort(sortAscendingTimeEntries);
-
-  for (let { id } of times) {
-    let timeClip = track.clips[id];
+  for (let timeClip of common.iterateObject(track.clips)) {
     if (timeClip.id === newClip.id) continue;
     let clipLength = common.getClipLength(timeClip);
 
@@ -195,17 +191,7 @@ function adjustForCollisions(newClip, track, isMovingRight) {
 }
 
 function isCollision(newClip, track) {
-  const times = _(track.clips).keys()
-    .reduce((acc, currClipId) => {
-      let currTrack = track.clips[currClipId];
-      acc.push({ time: Number(currTrack.startTime), id: currClipId });
-      acc.push({ time: Number(currTrack.endTime), id: currClipId });
-      return acc;
-    }, [])
-    .sort(sortAscendingTimeEntries);
-
-  for (let { id } of times) {
-    let timeClip = track.clips[id];
+  for (let timeClip of common.iterateObject(track.clips)) {
     if (timeClip.id === newClip.id) continue;
 
     if (newClip.endTime > timeClip.startTime && newClip.startTime <= timeClip.endTime) {
@@ -228,8 +214,4 @@ function getEdgeClipOnAdd(track, clip) {
   }
 
   return edgeClip;
-}
-
-function sortAscendingTimeEntries(a, b) {
-  return a.time - b.time;
 }
