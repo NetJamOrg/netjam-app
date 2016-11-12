@@ -6,13 +6,11 @@ import { resizeTable } from '../actions/TableActions';
 
 const mapDispatchToProps = {
   updateClip,
-  resizeTable
 };
 
 const mapStateToProps = (state) => ({
   numTracks: Object.keys(state.tracks).length,
   tracks: state.tracks,
-  widthPx: state.table.widthPx,
   timeInterval: state.table.timeInterval,
   timeSig: state.table.timeSig,
   tempo: state.table.tempo,

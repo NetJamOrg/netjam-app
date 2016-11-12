@@ -25,7 +25,7 @@ export default class Table extends Component {
       dragging: false,
       rel: null, // position relative to the cursor
       lastSeen: null,
-      slidingClip: false,
+      slidingClip: false
     };
   }
 
@@ -38,8 +38,7 @@ export default class Table extends Component {
     // set the table div width because of edge case where you shrink window with clip out of view,
     // if you scroll to view clip  the tracks will stop where you left the resize
     const tableDiv = document.getElementById('table-component');
-    //tableDiv.style.width = `${tableDiv.clientWidth}px`;  // HERE
-    this.props.resizeTable(tableDiv.clientWidth);
+    tableDiv.style.width = `${tableDiv.clientWidth}px`;
 
     (function () {
       var throttle = (type, name, obj) => {
@@ -65,8 +64,7 @@ export default class Table extends Component {
     // this is for the scenario wh
     window.addEventListener('optimizedResize', _.throttle((e) => {
       if (document.body.clientWidth > tableDiv.clientWidth) {
-        // tableDiv.style.width = `${document.body.clientWidth}px`; // HERE
-        this.props.resizeTable(document.body.clientWidth);
+        tableDiv.style.width = `${document.body.clientWidth}px`;
       }
     }, ProjectConstants.RESIZE_THROTTLE));
   }
@@ -79,8 +77,7 @@ export default class Table extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.widthPx != this.props.widthPx ||
-      nextProps.timeInterval != this.props.timeInterval ||
+    return nextProps.timeInterval != this.props.timeInterval ||
       nextProps.timeSig != this.props.timeSig;
   }
 
@@ -183,8 +180,7 @@ export default class Table extends Component {
     let mostEdgeClip = getMostEdgeClip();
     if (isMovingLeft && mostEdgeClip.id === newClip.id) {
       if (common.timeToPx(newClip.endTime) >= document.body.clientWidth) {
-        this.props.resizeTable(common.timeToPx(newClip.endTime));
-        // tableDiv.style.width = `${common.timeToPx(newClip.endTime)}px`; // HERE
+        tableDiv.style.width = `${common.timeToPx(newClip.endTime)}px`;
       }
     }
 
@@ -193,8 +189,7 @@ export default class Table extends Component {
         && tableDiv.clientWidth > document.body.clientWidth) {
         let newWidth = common.timeToPx(mostEdgeClip.endTime);
         if (newWidth < document.body.clientWidth) newWidth = document.body.clientWidth;
-        this.props.resizeTable(newWidth);
-        // tableDiv.style.width = `${newWidth}px`; // HERE
+        tableDiv.style.width = `${newWidth}px`;
       }
     }
 
@@ -206,7 +201,7 @@ export default class Table extends Component {
     let gridWidth = this.props.numMeasures * this.props.timeInterval;
 
     return (
-      <div id="table-component" style={{width: this.props.widthPx, backgroundSize: `${gridWidth}px`}}np>
+      <div id="table-component" style={{backgroundSize: `${gridWidth}px`}}>
         <div id="clip-menu">
           <button
             className="clip-menu-item"
@@ -226,13 +221,10 @@ export default class Table extends Component {
       </div>
     );
   }
-
-
 }
 
 Table.propTypes = {
   numTracks: React.PropTypes.number.isRequired,
-  widthPx:   React.PropTypes.number.isRequired
 };
 
 /* Presentation Generation */

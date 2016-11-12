@@ -1,7 +1,6 @@
 import ACTION_HANDLERS from '../actions/TableActionHandlers';
 
 const initialState = {
-  widthPx: 1300,
   timeInterval: 4, // 1/4
   timeSig: 4, // beats per measure
   tempo: 120,

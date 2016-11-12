@@ -34,21 +34,6 @@ const common = {
     return pixels * ProjectConstants.MS_PER_PIXEL;
   },
 
-  gridTimesAround: function (from, to, {numMeasures, timeInterval}) {
-    let idx = 0;
-    let next = (i) => ProjectConstants.MS_PER_PIXEL
-        * numMeasures * timeInterval * i;
-    let times = [];
-    // spin up to 'from' location
-    while(next(idx) < from) idx++;
-    // build list of times
-    while(next(idx) < to) {
-      times.push(next(idx));
-      idx++;
-    }
-    return times;
-  },
-
   numToPx: function (num) {
     return `${num}px`;
   },

@@ -50,7 +50,7 @@ const ACTION_HANDLERS = {
 
 
     // grid snapping
-    let gridTimes = common.gridTimesAround(newClip.startTime, newClip.endTime, tableInfo);
+    let gridTimes = gridTimesAround(newClip.startTime, newClip.endTime, tableInfo);
     let snapTarget = _.find(gridTimes, t => Math.abs(newClip.startTime - t) < ProjectConstants.GRID_SNAP_THRESHOLD);
     if(snapTarget != null) {
       let width = common.getClipLength(newClip);
@@ -155,4 +155,19 @@ function findEdgeClip(track) {
 
   if (!max) return null;
   return track.clips[track[max]];
+}
+
+// return grid time locations between from and to
+function gridTimesAround(from, to, {numMeasures, timeInterval}) {
+  let idx = 0;
+  let next = (i) => ProjectConstants.MS_PER_PIXEL * numMeasures * timeInterval * i;
+  let times = [];
+  // spin up to 'from' location
+  while(next(idx) < from) idx++;
+  // build list of times
+  while(next(idx) < to) {
+    times.push(next(idx));
+    idx++;
+  }
+  return times;
 }
