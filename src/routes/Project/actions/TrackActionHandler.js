@@ -50,13 +50,31 @@ const ACTION_HANDLERS = {
     const isMovingLeft = !isMovingRight;
 
     // grid snapping
-    const intervalRemainer = (newClip.startTime / lineSpacingTime) % 1;
-    console.log(intervalRemainer, lineSpacingTime);
-    let interval = Math.floor(newClip.startTime / lineSpacingTime);
-    interval = intervalRemainer < ProjectConstants.GRID_SNAP_THRESHOLD ? interval : interval + 1;
-    newClip.startTime = interval * lineSpacingTime;
-    newClip.endTime = newClip.startTime + updateClipLength;
-    console.log(newClip);
+    if (isMovingLeft) {
+      const intervalRemainer = (oldClip.startTime / lineSpacingTime) % 1;
+      const isClipOnInterval = intervalRemainer === 0;
+      let interval;
+      if (isClipOnInterval) {
+        interval = Math.ceil(newClip.startTime / lineSpacingTime);
+      } else {
+        interval = Math.floor(newClip.startTime / lineSpacingTime);
+      }
+
+      newClip.startTime = interval * lineSpacingTime;
+      newClip.endTime = newClip.startTime + updateClipLength;
+    } else {
+      const intervalRemainer = (oldClip.endTime / lineSpacingTime) % 1;
+      const isClipOnInterval = intervalRemainer === 0;
+      let interval;
+      if (isClipOnInterval) {
+        interval = Math.floor(newClip.endTime / lineSpacingTime);
+      } else {
+        interval = Math.ceil(newClip.endTime / lineSpacingTime);
+      }
+
+      newClip.endTime = interval * lineSpacingTime;
+      newClip.startTime = newClip.endTime - updateClipLength;
+    }
 
     // handle collision avoidance. not very efficient but should work.
     const adjustForCollisions = function (newClip, track) {
