@@ -1,0 +1,8 @@
+#cursor-head-component {
+  position: absolute;
+  width: 4px;
+  height: 100%;
+  background: gold;
+  z-index: 15;
+  pointer-events: none;
+}
