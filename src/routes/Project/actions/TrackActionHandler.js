@@ -74,13 +74,29 @@ const ACTION_HANDLERS = {
 
     const oldClip = action.payload.oldClip;
     const newClip = action.payload.newClip;
+    const lineSpacingTime = common.pxToTime(action.payload.lineSpacingPx);
+    const updateClipLength = common.getClipLength(newClip);
     const id = oldClip.id;
 
     if (_.isEqual(oldClip, newClip)) return state;
 
     let track = state[newClip.track];
-    let isMovingRight = oldClip.startTime < newClip.startTime;
-    let isMovingLeft = !isMovingRight;
+    const isMovingRight = oldClip.startTime < newClip.startTime;
+    const isMovingLeft = !isMovingRight;
+
+    // grid snapping
+
+    const intervalRemainer = (oldClip.startTime / lineSpacingTime) % 1;
+    const isClipOnInterval = intervalRemainer === 0;
+    let interval;
+    if (isClipOnInterval) {
+      interval = Math.ceil(newClip.startTime / lineSpacingTime);
+    } else {
+      interval = Math.floor(newClip.startTime / lineSpacingTime);
+    }
+
+    newClip.startTime = interval * lineSpacingTime;
+    newClip.endTime = newClip.startTime + updateClipLength;
 
     if (_.isEqual(oldClip, newClip)) return state;
 

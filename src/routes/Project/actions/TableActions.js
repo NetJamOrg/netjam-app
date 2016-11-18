@@ -1,4 +1,4 @@
 import ProjectConstants from '../constants';
 
-
-export const actions = {};
+export const actions = {
+};
