@@ -78,7 +78,6 @@ const ACTION_HANDLERS = {
 
     if (_.isEqual(oldClip, newClip)) return state;
 
-    let track = state[newClip.track];
     let isMovingRight = oldClip.startTime < newClip.startTime;
     let isMovingLeft = !isMovingRight;
 

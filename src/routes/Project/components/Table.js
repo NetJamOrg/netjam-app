@@ -264,7 +264,9 @@ function moveClip(e) {
   let trackHeight = trackDiv1.clientHeight;
 
   // + .1 makes it a bit more snappy
-  let newTrackNum = Math.round((e.pageY - tableTop) / trackHeight + .1) - 1;
+  let newTrackNum = (e.pageY - tableTop) / trackHeight - 1;
+  newTrackNum = newTrackNum % 1 >= ProjectConstants.MOVE_CLIP_UP_DOWN_THRESHOLD ? newTrackNum + 1 : newTrackNum;
+  newTrackNum = Math.floor(newTrackNum);
   if (newTrackNum >= this.props.numTracks) newTrackNum = this.props.numTracks - 1;
   if (newTrackNum < 0) newTrackNum = 0;
 
