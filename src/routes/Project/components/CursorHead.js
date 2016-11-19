@@ -7,67 +7,38 @@ import ProjectConstants from '../constants';
 import './CursorHead.scss';
 
 // File globals
-let tableElem;
-let toolbarElem;
+let tableOverlayElem;
 
 export default class CursorHead extends Component {
   constructor(props) {
     super(props);
     this.state = {
       cursorHeadPosition: false,
-      contextMenuOpen: false,
-      draggingPlayhead: false
+      draggingPlayHead: false
     };
   }
 
   componentDidMount() {
-    tableElem = document.getElementById('table-component');
-    toolbarElem = document.getElementById('toolbar-component');
+    tableOverlayElem = document.getElementById('table-component-overlay');
 
-    window.addEventListener('mousemove', this.onWindowMouseMove.bind(this), false);
-    toolbarElem.addEventListener('mousemove', this.onToolbarMouseMove.bind(this), false);
-    tableElem.addEventListener('contextmenu', this.onTableContextMenu.bind(this), false);
-    tableElem.addEventListener('mouseout', this.onTableMouseOut.bind(this), false);
-    tableElem.addEventListener('mousedown', this.onTableMouseDown.bind(this), false);
-    tableElem.addEventListener('mouseup', this.onTableMouseUp.bind(this), false);
-    tableElem.addEventListener('mousemove',
-      _.throttle(this.onTableMouseMove.bind(this), ProjectConstants.CURSOR_HEAD_THROTTLE), false);
+    window.addEventListener('mousemove',
+      _.throttle(this.onWindowMouseMove.bind(this), ProjectConstants.CURSOR_HEAD_THROTTLE), false);
+    tableOverlayElem.addEventListener('mousedown', this.onTableMouseDown.bind(this), false);
+    tableOverlayElem.addEventListener('mouseup', this.onTableMouseUp.bind(this), false);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('mousemove', this.onWindowMouseMove.bind(this), false);
-    toolbarElem.removeEventListener('mousemove', this.onToolbarMouseMove.bind(this), false);
-    tableElem.removeEventListener('contextmenu', this.onTableContextMenu.bind(this), false);
-    tableElem.removeEventListener('mouseout', this.onTableMouseOut.bind(this), false);
-    tableElem.removeEventListener('mousedown', this.onTableMouseDown.bind(this), false);
-    tableElem.removeEventListener('mouseup', this.onTableMouseUp.bind(this), false);
-    tableElem.removeEventListener('mousemove',
-      _.throttle(this.onTableMouseMove.bind(this), ProjectConstants.CURSOR_HEAD_THROTTLE), false);
-  }
-
-  onToolbarMouseMove(e) {
-    if (!this.state.cursorHeadPosition) return;
-
-    this.setState({
-      cursorHeadPosition: null
-    });
+    window.removeEventListener('mousemove',
+      _.throttle(this.onWindowMouseMove.bind(this), ProjectConstants.CURSOR_HEAD_THROTTLE), false);
+    tableOverlayElem.removeEventListener('mousedown', this.onTableMouseDown.bind(this), false);
+    tableOverlayElem.removeEventListener('mouseup', this.onTableMouseUp.bind(this), false);
   }
 
   onWindowMouseMove(e) {
-    /* this is a hacky way to know if the context menu was closed but onmousedown events don't fire when the regular
-    contextmenu is closed, if we only use custom context menus we can switch to mouse down events */
+    if (common.isContextMenuOpen()) return;
 
-    if (!this.state.contextMenuOpen || common.isContextMenuOpen()) return;
-
-    this.setState({
-      contextMenuOpen: false
-    });
-  }
-
-  onTableMouseMove(e) {
-    if (this.state.contextMenuOpen) return;
-
-    if (this.props.clipMoving || this.state.draggingPlayhead) return this.setState({
+    const inBounds = common.isInBounds(common.getBounds(tableOverlayElem), e.pageX, e.pageY);
+    if (this.props.clipMoving || this.state.draggingPlayHead || !inBounds) return this.setState({
       cursorHeadPosition: null
     });
 
@@ -76,33 +47,19 @@ export default class CursorHead extends Component {
     });
   }
 
-  onTableMouseOut(e) {
-    if (common.isInBounds(common.getBounds(tableElem), e.pageX, e.pageY)) return;
-
-    this.setState({
-      cursorHeadPosition: false
-    });
-  }
-
-  onTableContextMenu(e) {
-    this.setState({
-      contextMenuOpen: true
-    });
-  }
-
   onTableMouseDown(e) {
     if (e.srcElement.id === 'play-head-component') {
       this.setState({
-        draggingPlayhead: true
+        draggingPlayHead: true
       });
     }
   }
 
   onTableMouseUp(e) {
-    if (!this.state.draggingPlayhead) return;
+    if (!this.state.draggingPlayHead) return;
 
     this.setState({
-      draggingPlayhead: false
+      draggingPlayHead: false
     });
   }
 

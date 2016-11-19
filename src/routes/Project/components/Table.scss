@@ -10,4 +10,12 @@
   overflow: auto;
   min-height: 200px;
   background-image: linear-gradient(to right, #AAAAAA 1px, transparent 1px);
+
+  #table-component-overlay {
+    top: 100px;
+    position: fixed;
+    left: 0;
+    bottom: 45px;
+    right: 0;
+  }
 }

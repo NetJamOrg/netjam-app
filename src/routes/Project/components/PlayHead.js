@@ -7,7 +7,7 @@ import ProjectConstants from '../constants';
 import './PlayHead.scss';
 
 // File globals
-let tableDiv;
+let tableElem;
 let lastPos = 0;
 
 export default class PlayHead extends Component {
@@ -15,15 +15,15 @@ export default class PlayHead extends Component {
     super(props);
     this.state = {
       playHeadPosition: 0,
-      draggingPlayhead: false
+      draggingPlayHead: false
     };
   }
 
   componentDidMount() {
-    tableDiv = document.getElementById('table-component');
+    tableElem = document.getElementById('table-component');
 
     window.addEventListener('mouseup', this.onWindowMouseUp.bind(this), false);
-    tableDiv.addEventListener('mousedown', this.onTableMouseDown.bind(this), false);
+    tableElem.addEventListener('mousedown', this.onTableMouseDown.bind(this), false);
     window.addEventListener('scroll', this.onWindowScroll.bind(this), false);
     window.addEventListener('mousemove',
       _.throttle(this.onWindowMouseMove.bind(this), ProjectConstants.PLAY_HEAD_MOVE_THROTTLE), false);
@@ -31,7 +31,7 @@ export default class PlayHead extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('mouseup', this.onWindowMouseUp.bind(this), false);
-    tableDiv.removeEventListener('mousedown', this.onTableMouseDown.bind(this), false);
+    tableElem.removeEventListener('mousedown', this.onTableMouseDown.bind(this), false);
     window.removeEventListener('scroll', this.onWindowScroll.bind(this), false);
     window.removeEventListener('mousemove',
       _.throttle(this.onWindowMouseMove.bind(this), ProjectConstants.PLAY_HEAD_MOVE_THROTTLE), false);
@@ -39,11 +39,11 @@ export default class PlayHead extends Component {
 
   dragHead(x) {
     const bufferPxs = 4;
-    const atEndOfTable = x > tableDiv.clientWidth - bufferPxs;
+    const atEndOfTable = x > tableElem.clientWidth - bufferPxs;
 
     let newX = x;
     if (atEndOfTable) {
-      newX = tableDiv.clientWidth - bufferPxs;
+      newX = tableElem.clientWidth - bufferPxs;
     } else if (newX < 0) {
       newX = 0;
     }
@@ -54,7 +54,7 @@ export default class PlayHead extends Component {
   }
 
   onWindowScroll(e) {
-    if (!this.state.draggingPlayhead) return;
+    if (!this.state.draggingPlayHead) return;
 
     // this logic prevents choppy drag scrolling
     const scrollBufferPxs = 4;
@@ -70,10 +70,10 @@ export default class PlayHead extends Component {
     if (this.props.clipMoving || common.isContextMenuOpen()) return;
 
     let newState = {
-      draggingPlayhead: false
+      draggingPlayHead: false
     };
 
-    if (common.isInBounds(common.getBounds(tableDiv), e.pageX, e.pageY)) {
+    if (common.isInBounds(common.getBounds(tableElem), e.pageX, e.pageY)) {
       newState.playHeadPosition = e.pageX;
     }
 
@@ -84,12 +84,12 @@ export default class PlayHead extends Component {
     if (e.srcElement.id !== 'play-head-component') return;
 
     this.setState({
-      draggingPlayhead: true
+      draggingPlayHead: true
     });
   }
 
   onWindowMouseMove(e) {
-    if (!this.state.draggingPlayhead) return;
+    if (!this.state.draggingPlayHead) return;
 
     this.dragHead(e.pageX);
   }

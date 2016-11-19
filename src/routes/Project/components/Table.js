@@ -216,6 +216,7 @@ export default class Table extends Component {
         <PlayHead clipMoving={ this.state.clipMoving }/>
         <ClipContextMenu duplicateClip={ this.props.duplicateClip } tracks={ this.props.tracks }/>
         { createTracks(this.props) }
+        <div id="table-component-overlay"></div>
       </div>
     );
   }
