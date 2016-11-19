@@ -106,5 +106,5 @@ export default class PlayHead extends Component {
 function createStyles(state) {
   return {
     left: `${state.playHeadPosition}px`
-  }
+  };
 }
