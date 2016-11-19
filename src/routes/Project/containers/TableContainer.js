@@ -12,7 +12,11 @@ const mapDispatchToProps = {
 
 const mapStateToProps = (state) => ({
   numTracks: Object.keys(state.tracks).length,
-  tracks: state.tracks
+  tracks: state.tracks,
+  timeInterval: state.table.timeInterval,
+  timeSig: state.table.timeSig,
+  tempo: state.table.tempo,
+  numMeasures: state.table.numMeasures
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Table);

@@ -12,7 +12,6 @@ import logger from 'logger';
 import common from 'common';
 import ProjectConstants from '../constants';
 
-
 const CLASS_NAME = 'Table';
 const FILE_NAME = 'Table.js';
 
@@ -68,7 +67,9 @@ export default class Table extends Component {
 
     // this is for the scenario wh
     window.addEventListener('optimizedResize', _.throttle((e) => {
-      if (document.body.clientWidth > tableDiv.clientWidth) tableDiv.style.width = `${document.body.clientWidth}px`;
+      if (document.body.clientWidth > tableDiv.clientWidth) {
+        tableDiv.style.width = `${document.body.clientWidth}px`;
+      }
     }, ProjectConstants.RESIZE_THROTTLE));
   }
 
@@ -162,14 +163,16 @@ export default class Table extends Component {
     const tableDiv = document.getElementById('table-component');
 
     let oldClip = this.props.tracks[oldTrackNum].clips[clipId];
-    let newClip = { ...oldClip };
+    let newClip = _.cloneDeep(oldClip);
 
     let clipTimeLength = newClip.endTime - newClip.startTime;
     newClip.startTime = newStartTime;
     newClip.endTime = newStartTime + clipTimeLength;
     newClip.track = newTrackNum;
 
-    this.props.updateClip(oldClip, newClip);
+    const lineSpacingPx = this.props.numMeasures * this.props.timeInterval;
+
+    this.props.updateClip(oldClip, newClip, lineSpacingPx);
 
     const getMostEdgeClip = () => {
       let mostEdgeClip;
@@ -205,9 +208,10 @@ export default class Table extends Component {
   render() {
     const METHOD_NAME = 'render';
 
-    $log.d(CLASS_NAME, METHOD_NAME, 'Rendering');
+    const lineSpacingPx = this.props.numMeasures * this.props.timeInterval;
+
     return (
-      <div id="table-component">
+      <div id="table-component" style={{ backgroundSize: `${lineSpacingPx}px` }}>
         <CursorHead clipMoving={ this.state.clipMoving }/>
         <PlayHead clipMoving={ this.state.clipMoving }/>
         <ClipContextMenu duplicateClip={ this.props.duplicateClip } tracks={ this.props.tracks }/>
