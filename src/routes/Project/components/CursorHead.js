@@ -7,7 +7,9 @@ import ProjectConstants from '../constants';
 import './CursorHead.scss';
 
 // File globals
-let tableOverlayElem;
+let tableElem;
+let headerElem;
+let toolbarElem;
 
 export default class CursorHead extends Component {
   constructor(props) {
@@ -19,28 +21,34 @@ export default class CursorHead extends Component {
   }
 
   componentDidMount() {
-    tableOverlayElem = document.getElementById('table-component-overlay');
+    tableElem = document.getElementById('table-component');
+    toolbarElem = document.getElementById('toolbar-component');
+    headerElem = document.getElementById('header-component');
 
     window.addEventListener('mousemove',
       _.throttle(this.onWindowMouseMove.bind(this), ProjectConstants.CURSOR_HEAD_THROTTLE), false);
-    tableOverlayElem.addEventListener('mousedown', this.onTableMouseDown.bind(this), false);
-    tableOverlayElem.addEventListener('mouseup', this.onTableMouseUp.bind(this), false);
+    tableElem.addEventListener('mousedown', this.onTableMouseDown.bind(this), false);
+    tableElem.addEventListener('mouseup', this.onTableMouseUp.bind(this), false);
   }
 
   componentWillUnmount() {
     window.removeEventListener('mousemove',
       _.throttle(this.onWindowMouseMove.bind(this), ProjectConstants.CURSOR_HEAD_THROTTLE), false);
-    tableOverlayElem.removeEventListener('mousedown', this.onTableMouseDown.bind(this), false);
-    tableOverlayElem.removeEventListener('mouseup', this.onTableMouseUp.bind(this), false);
+    tableElem.removeEventListener('mousedown', this.onTableMouseDown.bind(this), false);
+    tableElem.removeEventListener('mouseup', this.onTableMouseUp.bind(this), false);
   }
 
   onWindowMouseMove(e) {
     if (common.isContextMenuOpen()) return;
 
-    const inBounds = common.isInBounds(common.getBounds(tableOverlayElem), e.pageX, e.pageY);
-    if (this.props.clipMoving || this.state.draggingPlayHead || !inBounds) return this.setState({
-      cursorHeadPosition: null
-    });
+    const inBoundsOfHeader = common.isInBounds(common.getBounds(headerElem), e.pageX, e.pageY);
+    const inBoundsOfToolbar = common.isInBounds(common.getBounds(toolbarElem), e.pageX, e.pageY);
+    const inBounds = !(inBoundsOfHeader || inBoundsOfToolbar);
+    if (this.props.clipMoving || this.state.draggingPlayHead || !inBounds) {
+      return this.setState({
+        cursorHeadPosition: null
+      });
+    }
 
     this.setState({
       cursorHeadPosition: e.pageX + 1

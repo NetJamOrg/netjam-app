@@ -8,6 +8,8 @@ import './PlayHead.scss';
 
 // File globals
 let tableElem;
+let toolbarElem;
+let headerElem;
 let lastPos = 0;
 
 export default class PlayHead extends Component {
@@ -21,17 +23,19 @@ export default class PlayHead extends Component {
 
   componentDidMount() {
     tableElem = document.getElementById('table-component');
+    toolbarElem = document.getElementById('toolbar-component');
+    headerElem = document.getElementById('header-component');
 
-    window.addEventListener('mouseup', this.onWindowMouseUp.bind(this), false);
     tableElem.addEventListener('mousedown', this.onTableMouseDown.bind(this), false);
+    window.addEventListener('mouseup', this.onWindowMouseUp.bind(this), false);
     window.addEventListener('scroll', this.onWindowScroll.bind(this), false);
     window.addEventListener('mousemove',
       _.throttle(this.onWindowMouseMove.bind(this), ProjectConstants.PLAY_HEAD_MOVE_THROTTLE), false);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('mouseup', this.onWindowMouseUp.bind(this), false);
     tableElem.removeEventListener('mousedown', this.onTableMouseDown.bind(this), false);
+    window.removeEventListener('mouseup', this.onWindowMouseUp.bind(this), false);
     window.removeEventListener('scroll', this.onWindowScroll.bind(this), false);
     window.removeEventListener('mousemove',
       _.throttle(this.onWindowMouseMove.bind(this), ProjectConstants.PLAY_HEAD_MOVE_THROTTLE), false);
@@ -73,7 +77,11 @@ export default class PlayHead extends Component {
       draggingPlayHead: false
     };
 
-    if (common.isInBounds(common.getBounds(tableElem), e.pageX, e.pageY)) {
+    const inBoundsOfHeader = common.isInBounds(common.getBounds(headerElem), e.pageX, e.pageY);
+    const inBoundsOfToolbar = common.isInBounds(common.getBounds(toolbarElem), e.pageX, e.pageY);
+    const inBounds = !(inBoundsOfHeader || inBoundsOfToolbar);
+
+    if (inBounds) {
       newState.playHeadPosition = e.pageX;
     }
 
