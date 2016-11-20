@@ -121,6 +121,16 @@ const common = {
 
   noop() {
     return () => {};
+  },
+
+  bindWithoutThis(cb) {
+    const bindArgs = Array.prototype.slice.call(arguments, 1);
+
+    return function () {
+      const internalArgs = Array.prototype.slice.call(arguments, 0);
+      const args = Array.prototype.concat(bindArgs, internalArgs);
+      return cb.apply(this, args);
+    };
   }
 };
 

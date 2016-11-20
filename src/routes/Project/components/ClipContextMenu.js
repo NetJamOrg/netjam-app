@@ -12,27 +12,33 @@ export const ClipContextMenu = (props) => {
   const menuItems = [
     {
       name: 'duplicate',
-      onClick: (rightClickedElem) => (e) => {
-        const clipId = common.getClipId(rightClickedElem);
-        const track = rightClickedElem.dataset.track;
-        if (!clipId) return;
-        console.log('duplicating');
-        props.duplicateClip(props.tracks[track].clips[clipId]);
+      props: {
+        onClick: (e, rightClickedElem) => {
+          const clipId = common.getClipId(rightClickedElem);
+          const track = rightClickedElem.dataset.track;
+          if (!clipId) return;
+          console.log('duplicating');
+          props.duplicateClip(props.tracks[track].clips[clipId]);
+        }
       }
     },
     {
       name: 'delete',
-      onClick: (rightClickedElem) => (e) => {
-        const clipId = common.getClipId(rightClickedElem);
-        const track = rightClickedElem.dataset.track;
-        if (!clipId) return;
-        console.log('delete clip');
+      props: {
+        onClick: (e, rightClickedElem) => {
+          const clipId = common.getClipId(rightClickedElem);
+          const track = rightClickedElem.dataset.track;
+          if (!clipId) return;
+          console.log('delete clip');
+        }
       }
     }
   ];
 
   return (
-    <ContextMenu menuItems={ menuItems } menuId ={ MENU_ID } stickToClass="clip-component"/>
+    <ContextMenu
+      menuItems={ menuItems } menuId ={ MENU_ID }
+     stickToClass="clip-component"/>
   );
 };
 

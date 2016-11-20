@@ -63,6 +63,17 @@ export default class ContextMenu extends Component {
     }
   }
 
+  bindRightClickElemToProps(props) {
+    console.log(props);
+    for (let prop in props) {
+      if (props.hasOwnProperty(prop) && typeof props[prop] === 'function') {
+        props[prop] = common.bindWithoutThis(props[prop], this.state.rightClickedElem);
+      }
+    }
+
+    return props;
+  }
+
   menuRef(c) {
     this.menu = c;
   }
@@ -78,26 +89,35 @@ export default class ContextMenu extends Component {
 
   createButtons() {
     return this.props.menuItems.map((menuItem) => {
-        let onClickEvent = this.closeMenu;
-        if (menuItem.onClick) {
-          onClickEvent = this.closeMenuAfter(menuItem.onClick(this.state.rightClickedElem));
+        let menuItemProps = this.bindRightClickElemToProps({ ...menuItem.props });
+
+        if (menuItemProps && menuItemProps.onClick) {
+          menuItemProps.onClick = this.closeMenuAfter(menuItemProps.onClick);
         }
 
+        if (menuItemProps && menuItemProps.onMouseDown) {
+          menuItemProps.onMouseDown = this.closeMenuAfter(menuItemProps.onMouseDown);
+        }
+
+        console.log(menuItemProps);
         return (
           <button
             className="contextmenu-item"
             key={ menuItem.name }
-            onClick={ onClickEvent }>
-            { menuItem.name }
-          </button>
-        );
+            { ...menuItemProps }>
+          { menuItem.name }
+        </button>
+          );
       }
     );
   }
 
   render() {
     return (
-      <div id={ this.props.menuId } ref={ this.menuRef } className="contextmenu" style={ this.createStyles() }>
+      <div id={ this.props.menuId }
+           ref={ this.menuRef }
+           className="contextmenu"
+           style={ this.createStyles() } >
         { this.createButtons() }
       </div>
     );
@@ -109,6 +129,6 @@ ContextMenu.propTypes = {
   stickToClass: PropTypes.string.isRequired,
   menuItems: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string.isRequired,
-    onClick: PropTypes.func
+    props: PropTypes.object
   })).isRequired
 };
