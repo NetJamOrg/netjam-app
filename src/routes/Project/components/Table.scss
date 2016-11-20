@@ -6,13 +6,16 @@
   flex-direction: column;
   border-top: 1px solid black;
   margin-bottom: 50px;
+  position: relative;
   overflow: auto;
+  min-height: 200px;
   background-image: linear-gradient(to right, #AAAAAA 1px, transparent 1px);
 
-  #clip-menu {
-    display: none;
+  #table-component-overlay {
+    top: 100px;
     position: fixed;
-    z-index: 1;
-    flex-direction: column;
+    left: 0;
+    bottom: 45px;
+    right: 0;
   }
 }

@@ -1,0 +1,10 @@
+#play-head-component {
+  position: absolute;
+  width: 4px;
+  background: mediumvioletred;
+  z-index: 20;
+  cursor: ew-resize;
+  top: 0;
+  bottom: 0;
+  margin-bottom: 1px;
+}

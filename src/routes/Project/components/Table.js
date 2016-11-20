@@ -4,6 +4,9 @@ import _ from 'lodash';
 import './Table.scss';
 
 import TrackContainer from '../containers/TrackContainer';
+import CursorHead from './CursorHead';
+import PlayHead from './PlayHead'
+import ClipContextMenu from './ClipContextMenu';
 
 import logger from 'logger';
 import common from 'common';
@@ -25,7 +28,8 @@ export default class Table extends Component {
       dragging: false,
       rel: null, // position relative to the cursor
       lastSeen: null,
-      slidingClip: false
+      slidingClip: false,
+      clipMoving: false
     };
   }
 
@@ -77,21 +81,12 @@ export default class Table extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return nextProps.timeInterval != this.props.timeInterval ||
-      nextProps.timeSig != this.props.timeSig;
+    return true;
   }
 
   // calculate relative position to the mouse and set dragging=true
   onMouseDown(e) {
     const METHOD_NAME = 'onMouseDown';
-
-    // hide the clip context menu if a clip menu item wasnt pressed
-    // the menu will be hidden in the onclick function otherwise the onclick
-    // doesnt get triggered
-    if (e.srcElement.className !== 'clip-menu-item') {
-      let clipMenu = document.getElementById('clip-menu');
-      if (clipMenu.style.display !== 'none') clipMenu.style.display = 'none';
-    }
 
     // only left mouse button
     if (e.button !== 0) return;
@@ -100,10 +95,10 @@ export default class Table extends Component {
     if (e.ctrlKey) return;
 
     let elem = e.srcElement;
-    let clipId = getClipId(elem);
+    let clipId = common.getClipId(elem);
     if (!clipId) return;
     let trackNum = getClipTrackNum(elem);
-    let pos = offset(elem);
+    let pos = common.offset(elem);
 
     // so when your mouse moves faster than clip doesn't change from pointer
     document.body.style.cursor = 'pointer';
@@ -141,7 +136,7 @@ export default class Table extends Component {
       }
 
       document.body.style.cursor = 'initial';
-      this.setState({ dragging: false });
+      this.setState({ dragging: false, clipMoving: false });
     }
 
     if (this.state.slidingClip) {
@@ -160,16 +155,6 @@ export default class Table extends Component {
 
     e.stopPropagation();
     e.preventDefault();
-  }
-
-  handleClipMenuClick(e) {
-    let clipMenu = document.getElementById('clip-menu');
-    clipMenu.style.display = 'none';
-    const clipId = e.nativeEvent.srcElement.parentNode.dataset.clipId;
-    const track = e.nativeEvent.srcElement.parentNode.dataset.track;
-    const option = e.nativeEvent.srcElement.dataset.option;
-
-    if (option === 'duplicate') this.props.duplicateClip(this.props.tracks[track].clips[clipId]);
   }
 
   updateClip(clipId, oldTrackNum, newTrackNum, newStartTime, isMovingLeft) {
@@ -227,21 +212,9 @@ export default class Table extends Component {
 
     return (
       <div id="table-component" style={{ backgroundSize: `${lineSpacingPx}px` }}>
-        <div id="clip-menu">
-          <button
-            className="clip-menu-item"
-            data-option="duplicate"
-            onClick={ this.handleClipMenuClick.bind(this) }>
-              Duplicate
-          </button>
-          <button
-            className="clip-menu-item"
-            data-option="delete"
-            onClick={ this.handleClipMenuClick.bind(this) }>
-            Delete
-          </button>
-        </div>
-
+        <CursorHead clipMoving={ this.state.clipMoving }/>
+        <PlayHead clipMoving={ this.state.clipMoving }/>
+        <ClipContextMenu duplicateClip={ this.props.duplicateClip } tracks={ this.props.tracks }/>
         { createTracks(this.props) }
       </div>
     );
@@ -249,7 +222,7 @@ export default class Table extends Component {
 }
 
 Table.propTypes = {
-  numTracks: React.PropTypes.number.isRequired,
+  numTracks: React.PropTypes.number.isRequired
 };
 
 /* Presentation Generation */
@@ -291,11 +264,13 @@ function moveClip(e) {
 
   const clip = getClipFromId(this.state.dragging.clipId, this.props);
 
-  let tableTop = offset(tableDiv).top;
+  let tableTop = common.offset(tableDiv).top;
   let trackHeight = trackDiv1.clientHeight;
 
   // + .1 makes it a bit more snappy
-  let newTrackNum = Math.round((e.pageY - tableTop) / trackHeight + .1) - 1;
+  let newTrackNum = (e.pageY - tableTop) / trackHeight - 1;
+  newTrackNum = newTrackNum % 1 >= ProjectConstants.MOVE_CLIP_UP_DOWN_THRESHOLD ? newTrackNum + 1 : newTrackNum;
+  newTrackNum = Math.floor(newTrackNum);
   if (newTrackNum >= this.props.numTracks) newTrackNum = this.props.numTracks - 1;
   if (newTrackNum < 0) newTrackNum = 0;
 
@@ -351,6 +326,7 @@ function moveClip(e) {
   this.setState({
     pos,
     dragging: { clipId: clip.id },
+    clipMoving: true,
     lastSeen,
     slidingClip
   });
@@ -363,37 +339,6 @@ function moveClip(e) {
 }
 
 /* HELPERS */
-function isWindow(obj) {
-  return obj != null && obj === obj.window;
-}
-
-function getWindow(elem) {
-  return isWindow(elem) ? elem : elem.nodeType === 9 && elem.defaultView;
-}
-
-function offset(elem) {
-  let docElem;
-  let win;
-  let box = { top: 0, left: 0 };
-  let doc = elem && elem.ownerDocument;
-
-  docElem = doc.documentElement;
-
-  if (typeof elem.getBoundingClientRect !== typeof undefined) {
-    box = elem.getBoundingClientRect();
-  }
-
-  win = getWindow(doc);
-  return {
-    top: box.top + win.pageYOffset - docElem.clientTop,
-    left: box.left + win.pageXOffset - docElem.clientLeft
-  };
-}
-
-function getClipId(elem) {
-  if (!elem) return null;
-  return elem.id.split('clip-component-')[1];
-}
 
 function getClipTrackNum(elem) {
   if (!elem) return null;

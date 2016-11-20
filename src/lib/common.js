@@ -42,12 +42,80 @@ const common = {
     return Number(pixels.split('px')[0]);
   },
 
-  iterObj: function* (obj) {
+  iterObj: function*(obj) {
     for (let key in obj) {
       if (obj.hasOwnProperty(key)) {
         yield obj[key];
       }
     }
+  },
+  isWindow(obj) {
+    return obj != null && obj === obj.window;
+  },
+
+  getWindow(elem) {
+    return this.isWindow(elem) ? elem : elem.nodeType === 9 && elem.defaultView;
+  },
+
+  offset(elem) {
+    let docElem;
+    let win;
+    let box = {top: 0, left: 0};
+    let doc = elem && elem.ownerDocument;
+
+    docElem = doc.documentElement;
+
+    if (typeof elem.getBoundingClientRect !== typeof undefined) {
+      box = elem.getBoundingClientRect();
+    }
+
+    win = this.getWindow(doc);
+    return {
+      top: box.top + win.pageYOffset - docElem.clientTop,
+      left: box.left + win.pageXOffset - docElem.clientLeft
+    };
+  },
+
+  getBounds(elem) {
+    const offset = this.offset(elem);
+
+    return {
+      tl: {
+        x: offset.left,
+        y: offset.top
+      },
+      br: {
+        x: offset.left + elem.clientWidth,
+        y: offset.top + elem.clientHeight
+      }
+    }
+  },
+
+  isInBounds(bounds, x, y) {
+    return x >= bounds.tl.x && x<= bounds.br.x && y >= bounds.tl.y && y <= bounds.br.y;
+  },
+
+  getClipId(elem) {
+    if (!elem) return null;
+    return elem.id.split('clip-component-')[1];
+  },
+
+  getClipElemFromId(id) {
+    return document.getElementById(`clip-component-${id}`);
+  },
+
+  isContextMenuOpen() {
+    const contextMenus = document.getElementsByClassName('contextmenu');
+    for (var i=0; i < contextMenus.length; i++) {
+      let contextMenu = contextMenus[i];
+      if (contextMenu.style.display !== 'none') return true;
+    }
+
+    return false;
+  },
+
+  hasClass(element, cls) {
+    return (' ' + element.className + ' ').indexOf(' ' + cls + ' ') > -1;
   }
 };
 

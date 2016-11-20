@@ -1,6 +1,9 @@
 #header-component {
   position: fixed;
   width: 100%;
+  z-index: 50;
+  background: #fff;
+  padding-bottom: 10px;
 
   .route--active {
     font-weight: bold;

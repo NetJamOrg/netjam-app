@@ -1,0 +1,10 @@
+#cursor-head-component {
+  position: absolute;
+  width: 4px;
+  background: gold;
+  z-index: 15;
+  pointer-events: none;
+  top: 0;
+  bottom: 0;
+  margin-bottom: 1px;
+}
