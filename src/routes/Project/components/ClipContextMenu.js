@@ -1,5 +1,7 @@
 import React from 'react';
 
+import common from 'common';
+
 import ContextMenu from '../../../components/ContextMenu/ContextMenu';
 
 import './ClipContextMenu.scss';
@@ -10,23 +12,20 @@ export const ClipContextMenu = (props) => {
   const menuItems = [
     {
       name: 'duplicate',
-      onClick: (e) => {
-        const clipMenuElem = e.nativeEvent.srcElement.parentNode;
-        const clipId = clipMenuElem.dataset.clipId;
-        const track = clipMenuElem.dataset.track;
+      onClick: (rightClickedElem) => (e) => {
+        const clipId = common.getClipId(rightClickedElem);
+        const track = rightClickedElem.dataset.track;
         if (!clipId) return;
-        clipMenuElem.style.display = 'none';
+        console.log('duplicating');
         props.duplicateClip(props.tracks[track].clips[clipId]);
       }
     },
     {
       name: 'delete',
-      onClick: (e) => {
-        const clipMenuElem = e.nativeEvent.srcElement.parentNode;
-        const clipId = clipMenuElem.dataset.clipId;
-        const track = clipMenuElem.dataset.track;
+      onClick: (rightClickedElem) => (e) => {
+        const clipId = common.getClipId(rightClickedElem);
+        const track = rightClickedElem.dataset.track;
         if (!clipId) return;
-        clipMenuElem.style.display = 'none';
         console.log('delete clip');
       }
     }

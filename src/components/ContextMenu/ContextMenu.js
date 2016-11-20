@@ -1,23 +1,41 @@
-import React, {Component} from 'react';
+import React, { Component, PropTypes } from 'react';
 
 import common from 'common';
 
 import './ContextMenu.scss';
 
-let clipMenuDiv;
-
 export default class ContextMenu extends Component {
-  addMenu(x, y, clipDiv) {
-    if(!this.menu) return;
-    this.menu.style.left = common.numToPx(x);
-    this.menu.style.top = common.numToPx(y);
-    this.menu.dataset.clipId = common.getClipId(clipDiv);
-    this.menu.dataset.track = clipDiv.dataset.track;
-    this.menu.style.display = 'flex';
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      x: 0,
+      y: 0,
+      isVisible: false,
+      rightClickedElem: null
+    };
+
+    this.menuRef = this.menuRef.bind(this);
+    this.createStyles = this.createStyles.bind(this);
+    this.createButtons = this.createButtons.bind(this);
+  }
+
+  addMenu(x, y, srcElem) {
+    this.setState({ x, y, isVisible: true, rightClickedElem: srcElem });
+  }
+
+  closeMenu() {
+    this.setState({ isVisible: false });
+  }
+
+  closeMenuAfter(before) {
+    return () => {
+      before();
+      this.closeMenu();
+    };
   }
 
   componentDidMount() {
-    clipMenuDiv = document.getElementById('clip-contextmenu');
     window.addEventListener('mousedown', this.onMouseDown.bind(this), false);
     window.addEventListener('contextmenu', this.onContextMenu.bind(this), false);
   }
@@ -28,40 +46,69 @@ export default class ContextMenu extends Component {
   }
 
   onMouseDown(e) {
-    // hide the clip context menu if a clip menu item wasnt pressed
-    // the menu will be hidden in the onclick function otherwise the onclick
-    // doesnt get triggered
-    if (e.srcElement.className !== 'contextmenu-item') {
-      if (clipMenuDiv.style.display !== 'none') clipMenuDiv.style.display = 'none';
+    const srcElemBounds = common.getBounds(this.menu);
+    const clickedInsideMenu = common.isInBounds(srcElemBounds, e.pageX, e.pageY);
+
+    /* Close context menu from menu-item onclick because display none
+     stops propagation of event to menu item onclick handler, it reaches here first */
+    if (!clickedInsideMenu) {
+      this.closeMenu();
     }
   }
 
   onContextMenu(e) {
-    const clipId = common.getClipId(e.srcElement);
-    if (clipId && common.hasClass(e.srcElement, this.props.stickToClass)) {
+    if (common.hasClass(e.srcElement, this.props.stickToClass)) {
       e.preventDefault();
       this.addMenu(e.clientX, e.clientY, e.srcElement);
     }
   }
 
-  render() {
-    return (
-      <div id={ this.props.menuId } ref={ (menu) => this.menu = menu } className="contextmenu">{ createButtons(this.props) } </div>
+  menuRef(c) {
+    this.menu = c;
+  }
+
+  /* PRESENTATIONAL */
+  createStyles() {
+    let newStyles = {};
+    newStyles.left = common.numToPx(this.state.x);
+    newStyles.top = common.numToPx(this.state.y);
+    newStyles.display = this.state.isVisible ? 'flex' : 'none';
+    return newStyles;
+  }
+
+  createButtons() {
+    return this.props.menuItems.map((menuItem) => {
+        let onClickEvent = this.closeMenu;
+        if (menuItem.onClick) {
+          onClickEvent = this.closeMenuAfter(menuItem.onClick(this.state.rightClickedElem));
+        }
+
+        return (
+          <button
+            className="contextmenu-item"
+            key={ menuItem.name }
+            onClick={ onClickEvent }>
+            { menuItem.name }
+          </button>
+        );
+      }
     );
   }
-}
 
-/* Presentational Functions */
-function createButtons(props) {
-  return props.menuItems.map((menuItem) => {
+  render() {
     return (
-      <button
-        className="contextmenu-item"
-        key={ menuItem.name }
-        onClick={ menuItem.onClick } >
+      <div id={ this.props.menuId } ref={ this.menuRef } className="contextmenu" style={ this.createStyles() }>
+        { this.createButtons() }
+      </div>
+    );
+  }
+};
 
-        { menuItem.name }
-      </button>
-    )
-  });
-}
+ContextMenu.propTypes = {
+  menuId: PropTypes.string.isRequired,
+  stickToClass: PropTypes.string.isRequired,
+  menuItems: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    onClick: PropTypes.func
+  })).isRequired
+};
