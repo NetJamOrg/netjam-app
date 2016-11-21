@@ -20,6 +20,7 @@ export default class ContextMenu extends Component {
     this.createButtons = this.createButtons.bind(this);
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onContextMenu = this.onContextMenu.bind(this);
+    this.onScroll = this.onScroll.bind(this);
   }
 
   addMenu(x, y, srcElem) {
@@ -63,6 +64,10 @@ export default class ContextMenu extends Component {
       e.preventDefault();
       this.addMenu(e.clientX, e.clientY, e.srcElement);
     }
+  }
+
+  onScroll(e) {
+    console.log(e);
   }
 
   bindRightClickElemToProps(props) {
