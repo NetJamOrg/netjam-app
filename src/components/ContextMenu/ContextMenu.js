@@ -64,7 +64,6 @@ export default class ContextMenu extends Component {
   }
 
   bindRightClickElemToProps(props) {
-    console.log(props);
     for (let prop in props) {
       if (props.hasOwnProperty(prop) && typeof props[prop] === 'function') {
         props[prop] = common.bindWithoutThis(props[prop], this.state.rightClickedElem);
@@ -99,15 +98,14 @@ export default class ContextMenu extends Component {
           menuItemProps.onMouseDown = this.closeMenuAfter(menuItemProps.onMouseDown);
         }
 
-        console.log(menuItemProps);
         return (
           <button
             className="contextmenu-item"
             key={ menuItem.name }
             { ...menuItemProps }>
           { menuItem.name }
-        </button>
-          );
+          </button>
+        );
       }
     );
   }

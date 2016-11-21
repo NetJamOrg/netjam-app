@@ -13,7 +13,7 @@ export const ClipContextMenu = (props) => {
     {
       name: 'duplicate',
       props: {
-        onClick: (e, rightClickedElem) => {
+        onClick: (rightClickedElem, e) => {
           const clipId = common.getClipId(rightClickedElem);
           const track = rightClickedElem.dataset.track;
           if (!clipId) return;
@@ -25,7 +25,7 @@ export const ClipContextMenu = (props) => {
     {
       name: 'delete',
       props: {
-        onClick: (e, rightClickedElem) => {
+        onClick: (rightClickedElem, e) => {
           const clipId = common.getClipId(rightClickedElem);
           const track = rightClickedElem.dataset.track;
           if (!clipId) return;
