@@ -18,6 +18,8 @@ export default class ContextMenu extends Component {
     this.menuRef = this.menuRef.bind(this);
     this.createStyles = this.createStyles.bind(this);
     this.createButtons = this.createButtons.bind(this);
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onContextMenu = this.onContextMenu.bind(this);
   }
 
   addMenu(x, y, srcElem) {
@@ -36,13 +38,13 @@ export default class ContextMenu extends Component {
   }
 
   componentDidMount() {
-    window.addEventListener('mousedown', this.onMouseDown.bind(this), false);
-    window.addEventListener('contextmenu', this.onContextMenu.bind(this), false);
+    window.addEventListener('mousedown', this.onMouseDown, false);
+    window.addEventListener('contextmenu', this.onContextMenu, false);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('mousedown', this.onMouseDown.bind(this), false);
-    window.removeEventListener('contextmenu', this.onContextMenu.bind(this), false);
+    window.removeEventListener('mousedown', this.onMouseDown, false);
+    window.removeEventListener('contextmenu', this.onContextMenu, false);
   }
 
   onMouseDown(e) {

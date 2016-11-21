@@ -31,13 +31,17 @@ export default class Table extends Component {
       slidingClip: false,
       clipMoving: false
     };
+
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseMove = this.onMouseMove.bind(this);
+    this.onMouseUp = this.onMouseUp.bind(this);
   }
 
   componentDidMount() {
-    window.addEventListener('mousedown', this.onMouseDown.bind(this), false);
-    window.addEventListener('mouseup', this.onMouseUp.bind(this), false);
+    window.addEventListener('mousedown', this.onMouseDown, false);
+    window.addEventListener('mouseup', this.onMouseUp, false);
     window.addEventListener('mousemove',
-      _.throttle(this.onMouseMove.bind(this), ProjectConstants.CLIP_MOVE_THROTTLE), false);
+      _.throttle(this.onMouseMove, ProjectConstants.CLIP_MOVE_THROTTLE), false);
 
     // set the table div width because of edge case where you shrink window with clip out of view,
     // if you scroll to view clip  the tracks will stop where you left the resize
@@ -74,10 +78,10 @@ export default class Table extends Component {
   }
 
   componentWillUnmount() {
-    window.removeEventListener('mousedown', this.onMouseDown.bind(this), false);
-    window.removeEventListener('mouseup', this.onMouseUp.bind(this), false);
+    window.removeEventListener('mousedown', this.onMouseDown, false);
+    window.removeEventListener('mouseup', this.onMouseUp, false);
     window.removeEventListener('mousemove',
-      _.throttle(this.onMouseMove.bind(this), ProjectConstants.CLIP_MOVE_THROTTLE), false);
+      _.throttle(this.onMouseMove, ProjectConstants.CLIP_MOVE_THROTTLE), false);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
