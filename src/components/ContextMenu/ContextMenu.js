@@ -12,7 +12,9 @@ export default class ContextMenu extends Component {
       x: 0,
       y: 0,
       isVisible: false,
-      rightClickedElem: null
+      rightClickedElem: null,
+      stickyElemOffset: null,
+      originalPos: null
     };
 
     this.menuRef = this.menuRef.bind(this);
@@ -24,7 +26,14 @@ export default class ContextMenu extends Component {
   }
 
   addMenu(x, y, srcElem) {
-    this.setState({ x, y, isVisible: true, rightClickedElem: srcElem });
+    if (!srcElem) return;
+    this.setState({
+      x, y,
+      isVisible: true,
+      rightClickedElem: srcElem,
+      stickyElemOffset: srcElem.getBoundingClientRect(),
+      originalPos: { x, y }
+    });
   }
 
   closeMenu() {
@@ -41,11 +50,14 @@ export default class ContextMenu extends Component {
   componentDidMount() {
     window.addEventListener('mousedown', this.onMouseDown, false);
     window.addEventListener('contextmenu', this.onContextMenu, false);
+    common.throttle('scroll', 'scrollOptimized');
+    window.addEventListener('scrollOptimized', this.onScroll);
   }
 
   componentWillUnmount() {
     window.removeEventListener('mousedown', this.onMouseDown, false);
     window.removeEventListener('contextmenu', this.onContextMenu, false);
+    window.removeEventListener('scrollOptimized', this.onScroll);
   }
 
   onMouseDown(e) {
@@ -67,7 +79,16 @@ export default class ContextMenu extends Component {
   }
 
   onScroll(e) {
-    console.log(e);
+    if (!this.state.isVisible || !this.state.rightClickedElem) return;
+    const newOffset = this.state.rightClickedElem.getBoundingClientRect();
+    const dX = newOffset.left - this.state.stickyElemOffset.left;
+    const dY = newOffset.top - this.state.stickyElemOffset.top;
+    if (!dX || !dY) {
+      this.setState({
+        x: this.state.originalPos.x + dX,
+        y: this.state.originalPos.y + dY
+      });
+    }
   }
 
   bindRightClickElemToProps(props) {
