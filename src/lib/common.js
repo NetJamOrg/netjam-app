@@ -123,12 +123,18 @@ const common = {
     return () => {};
   },
 
-  bindWithoutThis(cb) {
+  bindWithoutThis(cb, options) {
     const bindArgs = Array.prototype.slice.call(arguments, 1);
 
     return function () {
+      let args;
       const internalArgs = Array.prototype.slice.call(arguments, 0);
-      const args = Array.prototype.concat(bindArgs, internalArgs);
+      if (options && options.bindBefore) {
+        args = Array.prototype.concat(internalArgs, bindArgs);
+      } else {
+        args = Array.prototype.concat(internalArgs, bindArgs);
+      }
+
       return cb.apply(this, args);
     };
   },

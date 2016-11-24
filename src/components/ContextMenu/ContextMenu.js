@@ -41,8 +41,8 @@ export default class ContextMenu extends Component {
   }
 
   closeMenuAfter(before) {
-    return () => {
-      before();
+    return (e) => {
+      before(e);
       this.closeMenu();
     };
   }
