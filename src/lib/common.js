@@ -106,7 +106,7 @@ const common = {
   },
 
   isContextMenuOpen() {
-    const contextMenus = document.getElementsByClassName('contextmenu');
+    const contextMenus = document.getElementsByClassName('react-contextmenu');
     for (let i = 0; i < contextMenus.length; i++) {
       let contextMenu = contextMenus[i];
       if (contextMenu.style.display !== 'none') return true;
