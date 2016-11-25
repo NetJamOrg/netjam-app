@@ -201,7 +201,7 @@ export default class Table extends Component {
       <div id="table-component" style={{ backgroundSize: `${lineSpacingPx}px` }}>
         <CursorHead clipMoving={ this.state.clipMoving }/>
         <PlayHead clipMoving={ this.state.clipMoving }/>
-        <ClipContextMenu duplicateClip={ this.props.duplicateClip } tracks={ this.props.tracks }/>
+        <ClipContextMenu { ...this.props } />
         { createTracks(this.props) }
       </div>
     );

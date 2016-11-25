@@ -19,7 +19,8 @@ export const ClipContextMenu = (props) => {
           const track = rightClickedElem.dataset.track;
           if (!clipId) return;
           console.log(data.itemId, 'clicked');
-          props.duplicateClip(props.tracks[track].clips[clipId]);
+          const clip = props.tracks[track].clips[clipId];
+          props.duplicateClip(clip);
         }
       }
     },
@@ -32,6 +33,8 @@ export const ClipContextMenu = (props) => {
           const track = rightClickedElem.dataset.track;
           if (!clipId) return;
           console.log(data.itemId, 'clicked');
+          const clip = props.tracks[track].clips[clipId];
+          props.deleteClip(clip);
         }
       }
     }

@@ -163,7 +163,8 @@ const ACTION_HANDLERS = {
         edgeClip: findEdgeClip(newClips)
       }
     };
-  }
+  },
+
 };
 
 export default ACTION_HANDLERS;
