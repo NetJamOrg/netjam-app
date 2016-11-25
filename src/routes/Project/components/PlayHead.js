@@ -10,6 +10,7 @@ import './PlayHead.scss';
 let tableElem;
 let toolbarElem;
 let headerElem;
+let paramsElem;
 let lastPos = 0;
 
 export default class PlayHead extends Component {
@@ -25,6 +26,7 @@ export default class PlayHead extends Component {
     tableElem = document.getElementById('table-component');
     toolbarElem = document.getElementById('toolbar-component');
     headerElem = document.getElementById('header-component');
+    paramsElem = document.getElementById('params-component');
 
     tableElem.addEventListener('mousedown', this.onTableMouseDown.bind(this), false);
     window.addEventListener('mouseup', this.onWindowMouseUp.bind(this), false);
@@ -79,7 +81,8 @@ export default class PlayHead extends Component {
 
     const inBoundsOfHeader = common.isInBounds(common.getBounds(headerElem), e.pageX, e.pageY);
     const inBoundsOfToolbar = common.isInBounds(common.getBounds(toolbarElem), e.pageX, e.pageY);
-    const inBounds = !(inBoundsOfHeader || inBoundsOfToolbar);
+    const inBoundsOfParams = common.isInBounds(common.getBounds(paramsElem), e.pageX, e.pageY);
+    const inBounds = !(inBoundsOfHeader || inBoundsOfToolbar || inBoundsOfParams);
 
     if (inBounds) {
       newState.playHeadPosition = e.pageX;

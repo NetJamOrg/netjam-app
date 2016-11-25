@@ -10,6 +10,7 @@ import './CursorHead.scss';
 let tableElem;
 let headerElem;
 let toolbarElem;
+let paramsElem;
 
 export default class CursorHead extends Component {
   constructor(props) {
@@ -24,6 +25,7 @@ export default class CursorHead extends Component {
     tableElem = document.getElementById('table-component');
     toolbarElem = document.getElementById('toolbar-component');
     headerElem = document.getElementById('header-component');
+    paramsElem = document.getElementById('params-component');
 
     window.addEventListener('mousemove',
       _.throttle(this.onWindowMouseMove.bind(this), ProjectConstants.CURSOR_HEAD_THROTTLE), false);
@@ -43,7 +45,8 @@ export default class CursorHead extends Component {
 
     const inBoundsOfHeader = common.isInBounds(common.getBounds(headerElem), e.pageX, e.pageY);
     const inBoundsOfToolbar = common.isInBounds(common.getBounds(toolbarElem), e.pageX, e.pageY);
-    const inBounds = !(inBoundsOfHeader || inBoundsOfToolbar);
+    const inBoundsOfParams = common.isInBounds(common.getBounds(paramsElem), e.pageX, e.pageY);
+    const inBounds = !(inBoundsOfHeader || inBoundsOfToolbar || inBoundsOfParams);
     if (this.props.clipMoving || this.state.draggingPlayHead || !inBounds) {
       return this.setState({
         cursorHeadPosition: null
