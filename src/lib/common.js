@@ -42,13 +42,14 @@ const common = {
     return Number(pixels.split('px')[0]);
   },
 
-  iterObj: function*(obj) {
+  iterObj: function* (obj) {
     for (let key in obj) {
       if (obj.hasOwnProperty(key)) {
         yield obj[key];
       }
     }
   },
+
   isWindow(obj) {
     return obj != null && obj === obj.window;
   },
@@ -60,7 +61,7 @@ const common = {
   offset(elem) {
     let docElem;
     let win;
-    let box = {top: 0, left: 0};
+    let box = { top: 0, left: 0 };
     let doc = elem && elem.ownerDocument;
 
     docElem = doc.documentElement;
@@ -88,11 +89,11 @@ const common = {
         x: offset.left + elem.clientWidth,
         y: offset.top + elem.clientHeight
       }
-    }
+    };
   },
 
   isInBounds(bounds, x, y) {
-    return x >= bounds.tl.x && x<= bounds.br.x && y >= bounds.tl.y && y <= bounds.br.y;
+    return x >= bounds.tl.x && x <= bounds.br.x && y >= bounds.tl.y && y <= bounds.br.y;
   },
 
   getClipId(elem) {
@@ -105,8 +106,8 @@ const common = {
   },
 
   isContextMenuOpen() {
-    const contextMenus = document.getElementsByClassName('contextmenu');
-    for (var i=0; i < contextMenus.length; i++) {
+    const contextMenus = document.getElementsByClassName('react-contextmenu');
+    for (let i = 0; i < contextMenus.length; i++) {
       let contextMenu = contextMenus[i];
       if (contextMenu.style.display !== 'none') return true;
     }
@@ -116,6 +117,42 @@ const common = {
 
   hasClass(element, cls) {
     return (' ' + element.className + ' ').indexOf(' ' + cls + ' ') > -1;
+  },
+
+  noop() {
+    return () => {};
+  },
+
+  bindWithoutThis(cb, options) {
+    const bindArgs = Array.prototype.slice.call(arguments, 1);
+
+    return function () {
+      let args;
+      const internalArgs = Array.prototype.slice.call(arguments, 0);
+      if (options && options.bindBefore) {
+        args = Array.prototype.concat(internalArgs, bindArgs);
+      } else {
+        args = Array.prototype.concat(internalArgs, bindArgs);
+      }
+
+      return cb.apply(this, args);
+    };
+  },
+
+  throttle(type, name, obj) {
+    obj = obj || window;
+    let running = false;
+    let func = () => {
+      if (running) { return; }
+
+      running = true;
+      requestAnimationFrame(() => {
+        obj.dispatchEvent(new CustomEvent(name));
+        running = false;
+      });
+    };
+
+    obj.addEventListener(type, func);
   }
 };
 

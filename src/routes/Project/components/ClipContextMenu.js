@@ -1,6 +1,8 @@
 import React from 'react';
 
-import ContextMenu from '../../../components/ContextMenu/ContextMenu';
+import common from 'common';
+
+import ContextMenu from 'react-contextulize';
 
 import './ClipContextMenu.scss';
 
@@ -9,31 +11,36 @@ const MENU_ID = 'clip-contextmenu';
 export const ClipContextMenu = (props) => {
   const menuItems = [
     {
-      name: 'duplicate',
-      onClick: (e) => {
-        const clipMenuElem = e.nativeEvent.srcElement.parentNode;
-        const clipId = clipMenuElem.dataset.clipId;
-        const track = clipMenuElem.dataset.track;
-        if (!clipId) return;
-        clipMenuElem.style.display = 'none';
-        props.duplicateClip(props.tracks[track].clips[clipId]);
+      itemId: 'duplicate',
+      itemText: 'Duplicate',
+      props: {
+        onClick: (e, rightClickedElem, data) => {
+          const clipId = common.getClipId(rightClickedElem);
+          const track = rightClickedElem.dataset.track;
+          if (!clipId) return;
+          console.log(data.itemId, 'clicked');
+          props.duplicateClip(props.tracks[track].clips[clipId]);
+        }
       }
     },
     {
-      name: 'delete',
-      onClick: (e) => {
-        const clipMenuElem = e.nativeEvent.srcElement.parentNode;
-        const clipId = clipMenuElem.dataset.clipId;
-        const track = clipMenuElem.dataset.track;
-        if (!clipId) return;
-        clipMenuElem.style.display = 'none';
-        console.log('delete clip');
+      itemId: 'delete',
+      itemText: 'Delete',
+      props: {
+        onClick: (e, rightClickedElem, data) => {
+          const clipId = common.getClipId(rightClickedElem);
+          const track = rightClickedElem.dataset.track;
+          if (!clipId) return;
+          console.log(data.itemId, 'clicked');
+        }
       }
     }
   ];
 
   return (
-    <ContextMenu menuItems={ menuItems } menuId ={ MENU_ID } stickToClass="clip-component"/>
+    <ContextMenu
+      menuItems={ menuItems } menuId ={ MENU_ID }
+     stickToClass="clip-component"/>
   );
 };
 

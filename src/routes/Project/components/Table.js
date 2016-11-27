@@ -17,6 +17,7 @@ const FILE_NAME = 'Table.js';
 
 const $log = logger(FILE_NAME);
 
+let tableDiv;
 export default class Table extends Component {
   constructor(props) {
     const METHOD_NAME = 'constructor';
@@ -31,57 +32,43 @@ export default class Table extends Component {
       slidingClip: false,
       clipMoving: false
     };
+
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseMove = _.throttle(this.onMouseMove.bind(this), ProjectConstants.CLIP_MOVE_THROTTLE);
+    this.onMouseUp = this.onMouseUp.bind(this);
+    this.onResize = this.onResize.bind(this);
   }
 
   componentDidMount() {
-    window.addEventListener('mousedown', this.onMouseDown.bind(this), false);
-    window.addEventListener('mouseup', this.onMouseUp.bind(this), false);
-    window.addEventListener('mousemove',
-      _.throttle(this.onMouseMove.bind(this), ProjectConstants.CLIP_MOVE_THROTTLE), false);
+    window.addEventListener('mousedown', this.onMouseDown, false);
+    window.addEventListener('mouseup', this.onMouseUp, false);
+    window.addEventListener('mousemove', this.onMouseMove, false);
 
     // set the table div width because of edge case where you shrink window with clip out of view,
     // if you scroll to view clip  the tracks will stop where you left the resize
-    const tableDiv = document.getElementById('table-component');
+    tableDiv = document.getElementById('table-component');
     tableDiv.style.width = `${tableDiv.clientWidth}px`;
-
-    (function () {
-      var throttle = (type, name, obj) => {
-        obj = obj || window;
-        var running = false;
-        var func = () => {
-          if (running) { return; }
-
-          running = true;
-          requestAnimationFrame(() => {
-            obj.dispatchEvent(new CustomEvent(name));
-            running = false;
-          });
-        };
-
-        obj.addEventListener(type, func);
-      };
-
-      /* init - you can init any event */
-      throttle('resize', 'optimizedResize');
-    })();
+    common.throttle('resize', 'optimizedResize');
 
     // this is for the scenario wh
-    window.addEventListener('optimizedResize', _.throttle((e) => {
-      if (document.body.clientWidth > tableDiv.clientWidth) {
-        tableDiv.style.width = `${document.body.clientWidth}px`;
-      }
-    }, ProjectConstants.RESIZE_THROTTLE));
+    window.addEventListener('optimizedResize', this.onResize, false);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('mousedown', this.onMouseDown.bind(this), false);
-    window.removeEventListener('mouseup', this.onMouseUp.bind(this), false);
-    window.removeEventListener('mousemove',
-      _.throttle(this.onMouseMove.bind(this), ProjectConstants.CLIP_MOVE_THROTTLE), false);
+    window.removeEventListener('mousedown', this.onMouseDown, false);
+    window.removeEventListener('mouseup', this.onMouseUp, false);
+    window.removeEventListener('mousemove', this.onMouseMove, false);
+    window.removeEventListener('optimizedResize', this.onResize, false);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
     return true;
+  }
+
+  onResize(e) {
+    if (document.body.clientWidth > tableDiv.clientWidth) {
+      tableDiv.style.width = `${document.body.clientWidth}px`;
+    }
   }
 
   // calculate relative position to the mouse and set dragging=true

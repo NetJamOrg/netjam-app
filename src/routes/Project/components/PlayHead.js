@@ -19,6 +19,11 @@ export default class PlayHead extends Component {
       playHeadPosition: 0,
       draggingPlayHead: false
     };
+
+    this.onWindowMouseMove = this.onWindowMouseMove.bind(this);
+    this.onWindowMouseUp = this.onWindowMouseUp.bind(this);
+    this.onWindowScroll = this.onWindowScroll.bind(this);
+    this.onTableMouseDown = this.onTableMouseDown.bind(this);
   }
 
   componentDidMount() {
@@ -26,19 +31,19 @@ export default class PlayHead extends Component {
     toolbarElem = document.getElementById('toolbar-component');
     headerElem = document.getElementById('header-component');
 
-    tableElem.addEventListener('mousedown', this.onTableMouseDown.bind(this), false);
-    window.addEventListener('mouseup', this.onWindowMouseUp.bind(this), false);
-    window.addEventListener('scroll', this.onWindowScroll.bind(this), false);
+    tableElem.addEventListener('mousedown', this.onTableMouseDown, false);
+    window.addEventListener('mouseup', this.onWindowMouseUp, false);
+    window.addEventListener('scroll', this.onWindowScroll, false);
     window.addEventListener('mousemove',
-      _.throttle(this.onWindowMouseMove.bind(this), ProjectConstants.PLAY_HEAD_MOVE_THROTTLE), false);
+      _.throttle(this.onWindowMouseMove, ProjectConstants.PLAY_HEAD_MOVE_THROTTLE), false);
   }
 
   componentWillUnmount() {
-    tableElem.removeEventListener('mousedown', this.onTableMouseDown.bind(this), false);
-    window.removeEventListener('mouseup', this.onWindowMouseUp.bind(this), false);
-    window.removeEventListener('scroll', this.onWindowScroll.bind(this), false);
+    tableElem.removeEventListener('mousedown', this.onTableMouseDown, false);
+    window.removeEventListener('mouseup', this.onWindowMouseUp, false);
+    window.removeEventListener('scroll', this.onWindowScroll, false);
     window.removeEventListener('mousemove',
-      _.throttle(this.onWindowMouseMove.bind(this), ProjectConstants.PLAY_HEAD_MOVE_THROTTLE), false);
+      _.throttle(this.onWindowMouseMove, ProjectConstants.PLAY_HEAD_MOVE_THROTTLE), false);
   }
 
   dragHead(x) {

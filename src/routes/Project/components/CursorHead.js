@@ -18,6 +18,10 @@ export default class CursorHead extends Component {
       cursorHeadPosition: false,
       draggingPlayHead: false
     };
+
+    this.onWindowMouseMove =  _.throttle(this.onWindowMouseMove.bind(this), ProjectConstants.CURSOR_HEAD_THROTTLE);
+    this.onTableMouseDown = this.onTableMouseDown.bind(this);
+    this.onTableMouseUp = this.onTableMouseUp.bind(this);
   }
 
   componentDidMount() {
@@ -25,17 +29,15 @@ export default class CursorHead extends Component {
     toolbarElem = document.getElementById('toolbar-component');
     headerElem = document.getElementById('header-component');
 
-    window.addEventListener('mousemove',
-      _.throttle(this.onWindowMouseMove.bind(this), ProjectConstants.CURSOR_HEAD_THROTTLE), false);
-    tableElem.addEventListener('mousedown', this.onTableMouseDown.bind(this), false);
-    tableElem.addEventListener('mouseup', this.onTableMouseUp.bind(this), false);
+    window.addEventListener('mousemove', this.onWindowMouseMove, false);
+    tableElem.addEventListener('mousedown', this.onTableMouseDown, false);
+    tableElem.addEventListener('mouseup', this.onTableMouseUp, false);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('mousemove',
-      _.throttle(this.onWindowMouseMove.bind(this), ProjectConstants.CURSOR_HEAD_THROTTLE), false);
-    tableElem.removeEventListener('mousedown', this.onTableMouseDown.bind(this), false);
-    tableElem.removeEventListener('mouseup', this.onTableMouseUp.bind(this), false);
+    window.removeEventListener('mousemove', this.onWindowMouseMove, false);
+    tableElem.removeEventListener('mousedown', this.onTableMouseDown, false);
+    tableElem.removeEventListener('mouseup', this.onTableMouseUp, false);
   }
 
   onWindowMouseMove(e) {
