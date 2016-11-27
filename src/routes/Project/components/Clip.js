@@ -31,11 +31,13 @@ export default class Clip extends Component {
 
 /* Styles Functions */
 function clipStyle(props) {
-  // console.log('clipStyle props', props);
-  return {
+  let newStyles = {
     left: `${common.timeToPx(props.clip.startTime)}px`,
     width: `${common.getClipWidth(props.clip)}px`
   };
+
+  if (props.isSelected) newStyles.background = 'darkblue';
+  return newStyles;
 }
 
 /* HELPERS */

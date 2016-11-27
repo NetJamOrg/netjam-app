@@ -5,7 +5,7 @@ import './Table.scss';
 
 import TrackContainer from '../containers/TrackContainer';
 import CursorHead from './CursorHead';
-import PlayHead from './PlayHead'
+import PlayHead from './PlayHead';
 import ClipContextMenu from './ClipContextMenu';
 
 import logger from 'logger';
@@ -30,7 +30,8 @@ export default class Table extends Component {
       rel: null, // position relative to the cursor
       lastSeen: null,
       slidingClip: false,
-      clipMoving: false
+      clipMoving: false,
+      selectedClips: {}
     };
 
     this.onMouseDown = this.onMouseDown.bind(this);
@@ -83,7 +84,10 @@ export default class Table extends Component {
 
     let elem = e.srcElement;
     let clipId = common.getClipId(elem);
-    if (!clipId) return;
+    if (!clipId) {
+      return this.deselectClips();
+    }
+
     let trackNum = getClipTrackNum(elem);
     let pos = common.offset(elem);
 
@@ -91,10 +95,16 @@ export default class Table extends Component {
     document.body.style.cursor = 'pointer';
 
     const altPressed = e.altKey;
+    const metaPressed = e.metaKey;
     if (altPressed) {
       const newId = common.uuid();
       this.props.dragDuplicateClip(this.props.tracks[trackNum].clips[clipId], newId);
       clipId = newId;
+    } else if (metaPressed) {
+      this.selectClip(clipId);
+    } else {
+      this.deselectClips();
+      this.selectClip(clipId);
     }
 
     this.setState({
@@ -142,6 +152,23 @@ export default class Table extends Component {
 
     e.stopPropagation();
     e.preventDefault();
+  }
+
+  selectClip(clipId) {
+    if (this.state.selectedClips[clipId]) return;
+
+    this.setState({
+      selectedClips: {
+        ...this.state.selectedClips,
+        [clipId]: true
+      }
+    });
+  }
+
+  deselectClips() {
+    if (!Object.keys(this.state.selectedClips)) return;
+
+    this.setState({ selectedClips: {} });
   }
 
   updateClip(clipId, oldTrackNum, newTrackNum, newStartTime, isMovingLeft) {
@@ -192,6 +219,15 @@ export default class Table extends Component {
     }
   }
 
+  createTracks() {
+    let tracks = [];
+    for (let i = 0; i < this.props.numTracks; i++) {
+      tracks.push(<TrackContainer key={ i } trackNum={ i } selectedClips={ this.state.selectedClips } />);
+    }
+
+    return tracks;
+  }
+
   render() {
     const METHOD_NAME = 'render';
 
@@ -202,7 +238,7 @@ export default class Table extends Component {
         <CursorHead clipMoving={ this.state.clipMoving }/>
         <PlayHead clipMoving={ this.state.clipMoving }/>
         <ClipContextMenu { ...this.props } />
-        { createTracks(this.props) }
+        { this.createTracks() }
       </div>
     );
   }
@@ -211,16 +247,6 @@ export default class Table extends Component {
 Table.propTypes = {
   numTracks: React.PropTypes.number.isRequired
 };
-
-/* Presentation Generation */
-function createTracks(props) {
-  let tracks = [];
-  for (let i = 0; i < props.numTracks; i++) {
-    tracks.push(<TrackContainer key={ i } trackNum={ i }/>);
-  }
-
-  return tracks;
-}
 
 /* EVENT HANDLERS */
 function moveClip(e) {
