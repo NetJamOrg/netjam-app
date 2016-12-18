@@ -5,7 +5,7 @@ import './Table.scss';
 
 import TrackContainer from '../containers/TrackContainer';
 import CursorHead from './CursorHead';
-import PlayHead from './PlayHead'
+import PlayHead from './PlayHead';
 import ClipContextMenu from './ClipContextMenu';
 
 import logger from 'logger';
@@ -205,6 +205,17 @@ export default class Table extends Component {
     }
   }
 
+  startRecording(e) {
+    let trackId = parseInt(e.target.dataset.id);
+
+    // add clip to track
+    // initiate recording
+    // (add recording comp state)
+    // some sort of service?
+    // updateClip every so often (ghost?)
+    debugger;
+  }
+
   render() {
     const METHOD_NAME = 'render';
 
@@ -213,7 +224,7 @@ export default class Table extends Component {
     return (
       <div id='table-component-container'>
         <div id='track-controls'>
-          { createControls(this.props) }
+          { createControls.call(this, this.props) }
         </div>
         <div id="table-component" style={{ backgroundSize: `${lineSpacingPx}px` }}>
           <CursorHead clipMoving={ this.state.clipMoving }/>
@@ -230,6 +241,9 @@ Table.propTypes = {
   numTracks: React.PropTypes.number.isRequired
 };
 
+////
+
+////
 /* Presentation Generation */
 function createTracks(props) {
   let tracks = [];
@@ -244,7 +258,7 @@ function createControls(props) {
   return _(0).range(props.numTracks)
     .map(i =>
          <div key={i} className='track-control' id={`track-control-${i}`} style={{ height: `${100 / props.numTracks}%` }}>
-         <button> R </button>
+         <button data-id={i} onClick={this.startRecording.bind(this)}> R </button>
          </div>
         ).value();
 }
