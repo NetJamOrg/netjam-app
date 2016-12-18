@@ -211,11 +211,16 @@ export default class Table extends Component {
     const lineSpacingPx = this.props.numMeasures * this.props.timeInterval;
 
     return (
-      <div id="table-component" style={{ backgroundSize: `${lineSpacingPx}px` }}>
-        <CursorHead clipMoving={ this.state.clipMoving }/>
-        <PlayHead clipMoving={ this.state.clipMoving }/>
-        <ClipContextMenu duplicateClip={ this.props.duplicateClip } tracks={ this.props.tracks }/>
-        { createTracks(this.props) }
+      <div id='table-component-container'>
+        <div id='track-controls'>
+          { createControls(this.props) }
+        </div>
+        <div id="table-component" style={{ backgroundSize: `${lineSpacingPx}px` }}>
+          <CursorHead clipMoving={ this.state.clipMoving }/>
+          <PlayHead clipMoving={ this.state.clipMoving }/>
+          <ClipContextMenu duplicateClip={ this.props.duplicateClip } tracks={ this.props.tracks }/>
+          { createTracks(this.props) }
+        </div>
       </div>
     );
   }
@@ -233,6 +238,15 @@ function createTracks(props) {
   }
 
   return tracks;
+}
+
+function createControls(props) {
+  return _(0).range(props.numTracks)
+    .map(i =>
+         <div key={i} className='track-control' id={`track-control-${i}`} style={{ height: `${100 / props.numTracks}%` }}>
+         <button> R </button>
+         </div>
+        ).value();
 }
 
 /* EVENT HANDLERS */

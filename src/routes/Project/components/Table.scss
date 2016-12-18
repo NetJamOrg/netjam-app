@@ -1,3 +1,20 @@
+#table-component-container {
+  display: inline-flex;
+  flex-grow: 1;
+}
+
+#track-controls {
+  width: 20px;
+  min-height: 200px;
+  background-color: hotpink;
+  margin-bottom: 50px;
+}
+
+.track-control {
+  width:100%;
+  border-bottom: 1px solid black;
+}
+
 #table-component {
   width: auto;
   background-color: lawngreen;
